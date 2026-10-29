@@ -1,17 +1,7 @@
-// components/SlotEquipe.js
-// Um dos 6 espaços da equipe: preenchido (sprite, nome, botão de remover)
-// ou vazio (mostra "+").
-// Props:
-//   pokemon    objeto do Pokémon ou null/undefined para slot vazio
-//   sprite     imagem local ou null
-//   onPress    slot vazio: chamado sem argumentos (ex.: ir para a Pokédex)
-//              slot preenchido: chamado com o pokemon (ex.: abrir detalhes)
-//   onRemover  chamado com o pokemon ao tocar no ✕
-//   style      estilo extra (ex.: largura na grade)
-
 import React, { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
-import BadgeTipo from './BadgeTipo';
+import { TIPOS } from '../data/tipos';
+import { COR, SOMBRA } from '../data/tema';
 
 export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style }) {
   const [erroImagem, setErroImagem] = useState(false);
@@ -19,6 +9,7 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
   if (!pokemon) {
     return (
       <Pressable
+        accessibilityRole="button"
         onPress={() => onPress && onPress()}
         style={({ pressed }) => [
           styles.slot,
@@ -36,11 +27,17 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
 
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={() => onPress && onPress(pokemon)}
-      style={({ pressed }) => [styles.slot, pressed && styles.pressionado, style]}
+      style={({ pressed }) => [styles.slot, styles.cheio, pressed && styles.pressionado, style]}
     >
       <Pressable
-        onPress={() => onRemover && onRemover(pokemon)}
+        accessibilityRole="button"
+        accessibilityLabel={`Remover ${pokemon.nome} da equipe`}
+        onPress={(event) => {
+          event.stopPropagation();
+          onRemover && onRemover(pokemon);
+        }}
         hitSlop={8}
         style={styles.remover}
       >
@@ -64,7 +61,7 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
 
       <View style={styles.tipos}>
         {pokemon.tipos.map((tipo) => (
-          <BadgeTipo key={tipo} tipo={tipo} pequeno />
+          <View key={tipo} style={[styles.bolinha, { backgroundColor: TIPOS[tipo].cor }]} />
         ))}
       </View>
     </Pressable>
@@ -73,43 +70,42 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
 
 const styles = StyleSheet.create({
   slot: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 8,
-    minHeight: 150,
+    aspectRatio: 1,
+    borderRadius: 18,
+    padding: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
   },
   vazio: {
-    backgroundColor: 'transparent',
+    backgroundColor: COR.superficie,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#bbb',
-    elevation: 0,
-    shadowOpacity: 0,
+    borderColor: '#D1D5DB',
+  },
+  cheio: {
+    backgroundColor: COR.branco,
+    borderWidth: 1,
+    borderColor: COR.borda,
+    ...SOMBRA,
   },
   pressionado: { opacity: 0.75 },
-  mais: { fontSize: 40, color: '#bbb', fontWeight: '300' },
+  mais: { fontSize: 38, color: COR.vermelho, fontWeight: '300' },
   remover: {
     position: 'absolute',
-    top: 6,
-    right: 6,
+    top: 4,
+    right: 4,
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: '#DC2626',
+    backgroundColor: COR.vermelho,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
-  removerTexto: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
-  imagem: { width: 72, height: 72 },
-  interrogacao: { fontSize: 32, color: '#aaa', fontWeight: 'bold' },
-  nome: { fontSize: 13, fontWeight: '700', marginTop: 4, marginBottom: 4 },
-  tipos: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  removerTexto: { color: COR.branco, fontSize: 11, fontWeight: 'bold' },
+  imagem: { width: 54, height: 54 },
+  interrogacao: { fontSize: 28, color: '#B0B5BD', fontWeight: 'bold' },
+  nome: { fontSize: 12, fontWeight: '700', color: COR.texto, marginTop: 2 },
+  tipos: { flexDirection: 'row', marginTop: 4 },
+  bolinha: { width: 10, height: 10, borderRadius: 5, marginHorizontal: 2 },
 });

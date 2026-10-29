@@ -1,79 +1,82 @@
 // screens/Home.js
-// Primeira tela: o usuário escolhe o jogo. O jogo vai para a Pokédex
-// pelo route.params ({ jogo: 'firered' }).
-// - Jogos offline (FireRed e Emerald): sempre aparecem.
-// - Jogos online: só aparecem quando há internet. Sem internet, um aviso
-//   explica por que sumiram. Quando a conexão volta, eles reaparecem sozinhos.
+// Página inicial: título, aviso de falta de internet e a lista de jogos com
+// capa e nome. Tocar em um jogo abre a Equipe dele (jogo vai por route.params).
+// - FireRed e Emerald (offline): sempre aparecem.
+// - Jogos online: só aparecem com internet; quando a conexão volta, eles
+//   reaparecem sozinhos.
 
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cabecalho from '../components/Cabecalho';
-import Botao from '../components/Botao';
+import CapaJogo from '../components/CapaJogo';
 import { LISTA_JOGOS } from '../data/jogos';
+import { CAPAS } from '../data/capas';
+import { COR } from '../data/tema';
 import { useEquipe } from '../context/EquipeContext';
 import useRede from '../services/useRede';
 
-const JOGOS_OFFLINE = LISTA_JOGOS.filter((jogo) => jogo.offline);
-const JOGOS_ONLINE = LISTA_JOGOS.filter((jogo) => !jogo.offline);
+// "A, B e C"
+function juntarNomes(nomes) {
+  if (nomes.length <= 1) return nomes.join('');
+  return nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1];
+}
+
+const NOMES_OFFLINE = juntarNomes(
+  LISTA_JOGOS.filter((jogo) => jogo.offline).map((jogo) => jogo.nome)
+);
 
 export default function Home({ navigation }) {
   const { equipe, MAX_EQUIPE } = useEquipe();
+  const insets = useSafeAreaInsets(); // margem para os botões do Android
   const online = useRede(); // true | false | null (ainda verificando)
 
-  function renderJogo(jogo) {
-    return (
-      <View key={jogo.id} style={styles.bloco}>
-        <Botao
-          texto={`Pokémon ${jogo.nome}`}
-          cor={jogo.cor}
-          onPress={() => navigation.navigate('Pokedex', { jogo: jogo.id })}
-        />
-        <Text style={styles.info}>
-          Equipe: {equipe[jogo.id].length}/{MAX_EQUIPE}
-        </Text>
-      </View>
-    );
-  }
-
-  const nomesOffline = JOGOS_OFFLINE.map((jogo) => jogo.nome).join(' e ');
+  // Offline sempre; online só com internet
+  const jogosVisiveis = LISTA_JOGOS.filter((jogo) => jogo.offline || online === true);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Cabecalho
-        titulo="Pokédex Gen 3 a 5"
-        subtitulo="Escolha o jogo para ver tipos e fraquezas"
-      />
+    <View style={styles.container}>
+      <Cabecalho titulo="Pokédex" subtitulo="Escolha o jogo para montar sua equipe" />
 
       {online === false ? (
-        <Text style={styles.aviso}>
-          📡 Sem internet: os jogos online ficam ocultos. {nomesOffline} funcionam
-          normalmente.
-        </Text>
+        <View style={styles.aviso}>
+          <Text style={styles.avisoTexto}>
+            📡 Sem internet: só {NOMES_OFFLINE} aparecem. Os outros jogos voltam quando
+            você se conectar.
+          </Text>
+        </View>
       ) : null}
 
-      <Text style={styles.secao}>Jogos offline</Text>
-      {JOGOS_OFFLINE.map(renderJogo)}
-
-      {online === true ? (
-        <>
-          <Text style={styles.secao}>Jogos online (precisam de internet)</Text>
-          {JOGOS_ONLINE.map(renderJogo)}
-        </>
-      ) : null}
-    </ScrollView>
+      <ScrollView contentContainerStyle={[styles.conteudo, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={styles.grade}>
+          {jogosVisiveis.map((jogo) => (
+            <CapaJogo
+              key={jogo.id}
+              jogo={jogo}
+              capa={CAPAS[jogo.id]}
+              quantidade={equipe[jogo.id].length}
+              max={MAX_EQUIPE}
+              onPress={() => navigation.navigate('Equipe', { jogo: jogo.id })}
+              style={styles.capaLargura}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#f2f2f2', flexGrow: 1 },
+  container: { flex: 1, backgroundColor: COR.fundo },
   aviso: {
-    backgroundColor: '#fff3cd',
-    color: '#664d03',
+    backgroundColor: '#FFF4CC',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 14,
     padding: 12,
-    borderRadius: 10,
-    marginBottom: 12,
   },
-  secao: { fontSize: 14, fontWeight: 'bold', color: '#555', marginTop: 8, marginBottom: 8 },
-  bloco: { marginBottom: 8 },
-  info: { textAlign: 'center', color: '#666', fontSize: 13 },
+  avisoTexto: { color: '#6B5200', fontSize: 13 },
+  conteudo: { padding: 16, paddingTop: 20 },
+  grade: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  capaLargura: { width: '47%' },
 });

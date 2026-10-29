@@ -8,6 +8,8 @@
 //   offline          true  = dados e sprites embutidos no app (funciona sem internet)
 //                    false = a lista e os sprites vêm da API (precisa de internet)
 //   ativo            false = esconde o jogo da Home
+//   baseOffline      (só jogos offline) id de outro jogo offline cujos sprites e lista
+//                    de disponíveis são reaproveitados. Sem esse campo, o jogo usa os próprios.
 //   pokedexRegional  Pokédex da PokéAPI que define quem está "disponível"
 //   spriteGeracao / spritePasta   pasta dos sprites na PokéAPI (e em assets/sprites/)
 
@@ -24,6 +26,45 @@ export const JOGOS = {
     pokedexRegional: 'kanto',
     spriteGeracao: 'generation-iii',
     spritePasta: 'firered-leafgreen',
+  },
+  leafgreen: {
+    id: 'leafgreen',
+    nome: 'LeafGreen',
+    cor: '#6DB33F',
+    geracao: 3,
+    maxId: 386,
+    offline: true,
+    ativo: true,
+    baseOffline: 'firered', // usa os sprites e a lista do FireRed
+    pokedexRegional: 'kanto',
+    spriteGeracao: 'generation-iii',
+    spritePasta: 'firered-leafgreen',
+  },
+  ruby: {
+    id: 'ruby',
+    nome: 'Ruby',
+    cor: '#B3122D',
+    geracao: 3,
+    maxId: 386,
+    offline: true,
+    ativo: true,
+    baseOffline: 'emerald', // usa os sprites e a lista do Emerald
+    pokedexRegional: 'hoenn',
+    spriteGeracao: 'generation-iii',
+    spritePasta: 'ruby-sapphire',
+  },
+  sapphire: {
+    id: 'sapphire',
+    nome: 'Sapphire',
+    cor: '#1E5BB8',
+    geracao: 3,
+    maxId: 386,
+    offline: true,
+    ativo: true,
+    baseOffline: 'emerald', // usa os sprites e a lista do Emerald
+    pokedexRegional: 'hoenn',
+    spriteGeracao: 'generation-iii',
+    spritePasta: 'ruby-sapphire',
   },
   emerald: {
     id: 'emerald',

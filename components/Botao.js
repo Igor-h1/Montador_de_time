@@ -1,54 +1,48 @@
-// components/Botao.js
-// Botão reutilizável.
-// Props: texto, onPress, variante ('primaria' | 'secundaria' | 'perigo'),
-//        desabilitado (boolean), cor (opcional: troca a cor da variante primária)
-
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-
-const VARIANTES = {
-  primaria: { fundo: '#2563EB', texto: '#fff', borda: '#2563EB' },
-  secundaria: { fundo: '#fff', texto: '#333', borda: '#bbb' },
-  perigo: { fundo: '#DC2626', texto: '#fff', borda: '#DC2626' },
-};
+import { COR } from '../data/tema';
 
 export default function Botao({
   texto,
   onPress,
   variante = 'primaria',
   desabilitado = false,
-  cor,
 }) {
-  const estilo = VARIANTES[variante] || VARIANTES.primaria;
-  const fundo = cor && variante === 'primaria' ? cor : estilo.fundo;
-  const borda = cor && variante === 'primaria' ? cor : estilo.borda;
+  const estiloVariante = styles[variante] || styles.primaria;
 
   return (
     <Pressable
-      onPress={onPress}
+      accessibilityRole="button"
       disabled={desabilitado}
+      onPress={onPress}
       style={({ pressed }) => [
         styles.botao,
-        { backgroundColor: fundo, borderColor: borda },
-        pressed && styles.pressionado,
+        estiloVariante,
         desabilitado && styles.desabilitado,
+        pressed && !desabilitado && styles.pressionado,
       ]}
     >
-      <Text style={[styles.texto, { color: estilo.texto }]}>{texto}</Text>
+      <Text style={[styles.texto, variante === 'secundaria' && styles.textoSecundario]}>
+        {texto}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   botao: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginVertical: 6,
   },
-  texto: { fontSize: 16, fontWeight: '700' },
-  pressionado: { opacity: 0.75 },
-  desabilitado: { opacity: 0.4 },
+  primaria: { backgroundColor: COR.vermelho },
+  secundaria: { backgroundColor: COR.superficie, borderWidth: 1, borderColor: COR.borda },
+  perigo: { backgroundColor: '#B3001B' },
+  texto: { color: COR.branco, fontSize: 15, fontWeight: '700' },
+  textoSecundario: { color: COR.texto },
+  desabilitado: { opacity: 0.5 },
+  pressionado: { opacity: 0.8 },
 });

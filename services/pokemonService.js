@@ -27,8 +27,13 @@ const LISTA_VAZIA = [];
 // React.memo do Card funcionando (um objeto novo a cada render quebraria isso).
 const CACHE_SPRITES_ONLINE = {};
 
+// Jogos offline podem reaproveitar os dados de outro (ex.: LeafGreen usa os do FireRed)
+function baseOffline(jogo) {
+  return jogo.baseOffline || jogo.id;
+}
+
 function disponivelNoJogo(pokemon, jogo) {
-  if (jogo.offline) return Boolean(pokemon.disponibilidade[jogo.id]);
+  if (jogo.offline) return Boolean(pokemon.disponibilidade[baseOffline(jogo)]);
   const dex = obterDexOnline(jogo.id);
   return Boolean(dex && dex.has(pokemon.id));
 }
@@ -74,7 +79,7 @@ export function obterSprite(id, jogoId) {
   if (!jogo) return null;
 
   if (jogo.offline) {
-    const doJogo = SPRITES[jogoId];
+    const doJogo = SPRITES[baseOffline(jogo)];
     return (doJogo && doJogo[Number(id)]) || null;
   }
 

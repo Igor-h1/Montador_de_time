@@ -1,17 +1,18 @@
 // screens/Equipe.js
-// Os 6 slots da equipe do jogo (jogo vem por route.params), com:
-// - remover Pokémon (pelo Context)
-// - resumo dos tipos da equipe
-// - alerta de fraquezas em comum (2 ou mais Pokémon fracos ao mesmo tipo)
+// Gestão da equipe do jogo escolhido (jogo vem por route.params):
+// - 6 quadrados: vazio abre a Pokédex, preenchido abre os Detalhes
+// - ✕ remove o Pokémon
+// - resumo dos tipos e alerta de fraquezas em comum (2 ou mais Pokémon
+//   fracos ao mesmo tipo)
 
 import React, { useMemo } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import Cabecalho from '../components/Cabecalho';
-import Botao from '../components/Botao';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SlotEquipe from '../components/SlotEquipe';
 import BadgeTipo from '../components/BadgeTipo';
 import { JOGOS } from '../data/jogos';
 import { LISTA_TIPOS, TIPOS, multiplicador } from '../data/tipos';
+import { COR } from '../data/tema';
 import { obterSprite } from '../services/pokemonService';
 import { useEquipe } from '../context/EquipeContext';
 
@@ -22,6 +23,7 @@ export default function Equipe({ navigation, route }) {
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
   const { pokemonsDaEquipe, remover, MAX_EQUIPE } = useEquipe();
+  const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   const lista = useMemo(() => pokemonsDaEquipe(jogoId), [pokemonsDaEquipe, jogoId]);
   const slots = Array.from({ length: MAX_EQUIPE }, (_, i) => lista[i] || null);
@@ -60,12 +62,24 @@ export default function Equipe({ navigation, route }) {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Cabecalho
-        titulo={`Equipe ${jogo.nome}`}
-        subtitulo={`${lista.length}/${MAX_EQUIPE} Pokémon`}
-        cor={jogo.cor}
-      />
+    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
+      <View style={styles.topo}>
+        <View style={[styles.marca, { backgroundColor: jogo.cor }]} />
+        <View>
+          <Text style={styles.titulo}>{jogo.nome}</Text>
+          <Text style={styles.subtitulo}>
+            {lista.length}/{MAX_EQUIPE} Pokémon na equipe
+          </Text>
+        </View>
+      </View>
+
+      {lista.length < MAX_EQUIPE ? (
+        <Text style={styles.dica}>
+          {lista.length === 0
+            ? 'Adicione Pokémon para montar seu time. Toque em um quadrado vazio.'
+            : 'Toque em um quadrado vazio para escolher outro Pokémon.'}
+        </Text>
+      ) : null}
 
       <View style={styles.grade}>
         {slots.map((pokemon, indice) => (
@@ -80,19 +94,10 @@ export default function Equipe({ navigation, route }) {
         ))}
       </View>
 
-      {lista.length === 0 ? (
-        <View style={styles.vazio}>
-          <Text style={styles.vazioTexto}>Adicione Pokémon para montar seu time</Text>
-          <Botao
-            texto="Abrir Pokédex"
-            cor={jogo.cor}
-            onPress={() => navigation.navigate('Pokedex', { jogo: jogoId })}
-          />
-        </View>
-      ) : (
+      {lista.length > 0 ? (
         <>
           <View style={styles.secao}>
-            <Text style={styles.titulo}>Tipos da equipe</Text>
+            <Text style={styles.secaoTitulo}>Tipos da equipe</Text>
             <View style={styles.linha}>
               {resumoTipos.map(([tipo, quantidade]) => (
                 <View key={tipo} style={styles.tipoItem}>
@@ -104,10 +109,10 @@ export default function Equipe({ navigation, route }) {
           </View>
 
           <View style={styles.secao}>
-            <Text style={styles.titulo}>Fraquezas em comum</Text>
+            <Text style={styles.secaoTitulo}>Fraquezas em comum</Text>
 
             {lista.length < 2 ? (
-              <Text style={styles.dica}>
+              <Text style={styles.suave}>
                 Adicione mais um Pokémon para comparar as fraquezas da equipe.
               </Text>
             ) : fraquezasComuns.length === 0 ? (
@@ -130,25 +135,33 @@ export default function Equipe({ navigation, route }) {
             )}
           </View>
         </>
-      )}
+      ) : null}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#f2f2f2', flexGrow: 1 },
+  container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
+  topo: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  marca: { width: 6, height: 44, borderRadius: 3, marginRight: 12 },
+  titulo: { fontSize: 26, fontWeight: 'bold', color: COR.texto },
+  subtitulo: { fontSize: 14, color: COR.textoSuave },
+  dica: { color: COR.textoSuave, marginBottom: 14 },
   grade: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  slot: { width: '31.5%', marginBottom: 10 },
-  vazio: { alignItems: 'center', marginTop: 16 },
-  vazioTexto: { color: '#888', fontSize: 16, marginBottom: 16, textAlign: 'center' },
-  secao: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginTop: 8, marginBottom: 8 },
-  titulo: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
+  slot: { width: '31.5%', marginBottom: 12 },
+  secao: {
+    backgroundColor: COR.superficie,
+    borderRadius: 16,
+    padding: 14,
+    marginTop: 8,
+  },
+  secaoTitulo: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginBottom: 10 },
   linha: { flexDirection: 'row', flexWrap: 'wrap' },
   tipoItem: { flexDirection: 'row', alignItems: 'center', marginRight: 8 },
-  quantidade: { fontSize: 12, color: '#555', marginBottom: 6, marginRight: 4 },
-  dica: { color: '#777' },
-  semFraqueza: { color: '#0f5132', fontWeight: '600' },
-  alerta: { color: '#842029', fontWeight: '700', marginBottom: 10 },
+  quantidade: { fontSize: 12, color: COR.textoSuave, marginBottom: 6, marginRight: 4 },
+  suave: { color: COR.textoSuave },
+  semFraqueza: { color: '#0F6B2F', fontWeight: '600' },
+  alerta: { color: '#B3001B', fontWeight: '700', marginBottom: 10 },
   fraquezaLinha: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 },
-  fraquezaTexto: { fontSize: 13, color: '#444', flexShrink: 1, marginBottom: 6 },
+  fraquezaTexto: { fontSize: 13, color: COR.texto, flexShrink: 1, marginBottom: 6 },
 });
