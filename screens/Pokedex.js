@@ -1,11 +1,12 @@
 // screens/Pokedex.js
 // Grade de Pokémon do jogo escolhido (jogo vem por route.params).
+// - Jogo online: primeiro carrega a lista do jogo na API (com carregando/erro)
 // - Busca por nome ou número
 // - Filtro por tipo
 // - "Só disponíveis" (os bloqueados ficam com cadeado e não abrem)
 // - Toque em um Pokémon disponível -> Detalhes (pokemonId + jogo)
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,13 +14,17 @@ import {
   FlatList,
   ScrollView,
   Pressable,
+  ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import Card from '../components/Card';
 import Botao from '../components/Botao';
 import { JOGOS } from '../data/jogos';
 import { TIPOS, LISTA_TIPOS } from '../data/tipos';
 import { listarPorJogo, obterSprite } from '../services/pokemonService';
+import { carregarPokedexOnline, dexOnlineCarregada } from '../services/pokedexOnline';
+import useRede from '../services/useRede';
 
 // Minúsculas e sem acentos, para a busca não depender de maiúsculas
 function normalizar(texto) {
@@ -41,13 +46,38 @@ function Chip({ texto, ativo, cor, onPress }) {
 export default function Pokedex({ navigation, route }) {
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
+  const online = useRede();
 
   const [busca, setBusca] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState(null);
   const [apenasDisponiveis, setApenasDisponiveis] = useState(false);
 
-  // Os 386 do jogo (cada um com o campo "disponivel")
-  const todos = useMemo(() => listarPorJogo(jogoId), [jogoId]);
+  // Jogos offline já têm a lista; os online precisam buscá-la na API
+  const [dexPronta, setDexPronta] = useState(jogo.offline || dexOnlineCarregada(jogoId));
+  const [erro, setErro] = useState(null);
+
+  const carregarDex = useCallback(async () => {
+    setErro(null);
+    try {
+      const rede = await NetInfo.fetch();
+      if (rede.isConnected === false || rede.isInternetReachable === false) {
+        setErro('Sem internet. Conecte-se para carregar a lista deste jogo.');
+        return;
+      }
+      await carregarPokedexOnline(jogoId);
+      setDexPronta(true);
+    } catch (e) {
+      setErro('Não foi possível carregar a lista deste jogo. Tente novamente.');
+    }
+  }, [jogoId]);
+
+  // Ao abrir um jogo online cuja lista ainda não foi carregada, busca na API
+  useEffect(() => {
+    if (!dexPronta) carregarDex();
+  }, [dexPronta, carregarDex]);
+
+  // Os Pokémon do jogo (cada um com o campo "disponivel")
+  const todos = useMemo(() => listarPorJogo(jogoId), [jogoId, dexPronta]);
 
   // Aplica busca + tipo + disponibilidade
   const lista = useMemo(() => {
@@ -96,8 +126,35 @@ export default function Pokedex({ navigation, route }) {
     [jogoId, aoTocarCard]
   );
 
+  // Jogo online ainda sem a lista: mostra carregando ou o erro
+  if (!dexPronta) {
+    return (
+      <View style={styles.estado}>
+        {erro ? (
+          <>
+            <Text style={styles.estadoTexto}>{erro}</Text>
+            <Botao texto="Tentar de novo" cor={jogo.cor} onPress={carregarDex} />
+          </>
+        ) : (
+          <>
+            <ActivityIndicator size="large" color={jogo.cor} />
+            <Text style={styles.estadoTexto}>Carregando a Pokédex do {jogo.nome}...</Text>
+          </>
+        )}
+      </View>
+    );
+  }
+
+  const semRede = !jogo.offline && online === false;
+
   return (
     <View style={styles.container}>
+      {semRede ? (
+        <Text style={styles.aviso}>
+          📡 Sem internet: alguns sprites podem não aparecer.
+        </Text>
+      ) : null}
+
       <View style={styles.filtros}>
         <TextInput
           style={styles.busca}
@@ -172,6 +229,21 @@ export default function Pokedex({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f2f2f2' },
+  estado: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#f2f2f2',
+  },
+  estadoTexto: { color: '#555', fontSize: 16, textAlign: 'center', marginVertical: 16 },
+  aviso: {
+    backgroundColor: '#fff3cd',
+    color: '#664d03',
+    padding: 8,
+    textAlign: 'center',
+    fontSize: 13,
+  },
   filtros: { paddingHorizontal: 12, paddingTop: 12 },
   busca: {
     backgroundColor: '#fff',

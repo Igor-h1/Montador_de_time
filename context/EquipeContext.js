@@ -1,6 +1,6 @@
 // context/EquipeContext.js
-// Estado global da equipe, separado por jogo: { firered: [6, 94], emerald: [] }
-// Guarda só os IDs dos Pokémon (leve e fácil de salvar na Etapa 7).
+// Estado global da equipe, separado por jogo: { firered: [6, 94], emerald: [], ... }
+// Guarda só os IDs dos Pokémon (leve e fácil de salvar depois).
 //
 // Uso nas telas:
 //   const { adicionar, remover, pokemonsDaEquipe } = useEquipe();
@@ -14,7 +14,7 @@ export const MAX_EQUIPE = 6;
 
 const EquipeContext = createContext(null);
 
-// Gera { firered: [], emerald: [] } a partir de data/jogos.js
+// Gera { firered: [], emerald: [], ... } a partir de data/jogos.js
 function criarEquipeVazia() {
   const vazia = {};
   Object.keys(JOGOS).forEach((jogoId) => {
