@@ -19,6 +19,12 @@ const BASE_SPRITES_ONLINE =
 // Índice por id, para buscar sem varrer a lista inteira
 const POR_ID = new Map(POKEMONS.map((p) => [p.id, p]));
 
+// Índice por nome (sem pontuação nem maiúsculas: "Mr. Mime" e "mr mime" dão no mesmo)
+function normalizarNome(nome) {
+  return nome.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+const POR_NOME = new Map(POKEMONS.map((p) => [normalizarNome(p.nome), p]));
+
 // Cache da lista por jogo (evita recriar centenas de objetos a cada render)
 const CACHE_POR_JOGO = {};
 const LISTA_VAZIA = [];
@@ -36,6 +42,11 @@ function disponivelNoJogo(pokemon, jogo) {
   if (jogo.offline) return Boolean(pokemon.disponibilidade[baseOffline(jogo)]);
   const dex = obterDexOnline(jogo.id);
   return Boolean(dex && dex.has(pokemon.id));
+}
+
+// Retorna o Pokémon ou null se o nome não existir (usado pela Elite dos 4)
+export function buscarPorNome(nome) {
+  return POR_NOME.get(normalizarNome(nome)) || null;
 }
 
 // Retorna o Pokémon ou null se o id não existir

@@ -15,6 +15,8 @@ import Home from './screens/Home';
 import Equipe from './screens/Equipe';
 import Pokedex from './screens/Pokedex';
 import Detalhes from './screens/Detalhes';
+import Elite from './screens/Elite';
+import { obterElite } from './services/eliteService';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +52,14 @@ export default function App() {
               options={({ route }) => {
                 const pokemon = buscarPorId(route.params.pokemonId);
                 return { title: pokemon ? pokemon.nome : 'Detalhes' };
+              }}
+            />
+            <Stack.Screen
+              name="Elite"
+              component={Elite}
+              options={({ route }) => {
+                const elite = obterElite(route.params.jogo);
+                return { title: elite ? `Elite dos 4 · ${elite.regiao}` : 'Elite dos 4' };
               }}
             />
           </Stack.Navigator>
