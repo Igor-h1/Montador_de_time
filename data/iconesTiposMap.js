@@ -1,0 +1,65 @@
+// data/iconesTiposMap.js
+// GERADO por scripts/baixarIconesTipos.js. Não edite à mão.
+// IDS_TIPOS: número de cada tipo na PokéAPI (usado nos ícones dos jogos online).
+// ICONES_TIPOS: ícones embutidos dos jogos offline (o require precisa de caminhos fixos).
+
+export const IDS_TIPOS = {
+  normal: 1,
+  fire: 10,
+  water: 11,
+  electric: 13,
+  grass: 12,
+  ice: 15,
+  fighting: 2,
+  poison: 4,
+  ground: 5,
+  flying: 3,
+  psychic: 14,
+  bug: 7,
+  rock: 6,
+  ghost: 8,
+  dragon: 16,
+  dark: 17,
+  steel: 9,
+};
+
+export const ICONES_TIPOS = {
+  firered: {
+    normal: require('../assets/tipos/firered/normal.png'),
+    fire: require('../assets/tipos/firered/fire.png'),
+    water: require('../assets/tipos/firered/water.png'),
+    electric: require('../assets/tipos/firered/electric.png'),
+    grass: require('../assets/tipos/firered/grass.png'),
+    ice: require('../assets/tipos/firered/ice.png'),
+    fighting: require('../assets/tipos/firered/fighting.png'),
+    poison: require('../assets/tipos/firered/poison.png'),
+    ground: require('../assets/tipos/firered/ground.png'),
+    flying: require('../assets/tipos/firered/flying.png'),
+    psychic: require('../assets/tipos/firered/psychic.png'),
+    bug: require('../assets/tipos/firered/bug.png'),
+    rock: require('../assets/tipos/firered/rock.png'),
+    ghost: require('../assets/tipos/firered/ghost.png'),
+    dragon: require('../assets/tipos/firered/dragon.png'),
+    dark: require('../assets/tipos/firered/dark.png'),
+    steel: require('../assets/tipos/firered/steel.png'),
+  },
+  emerald: {
+    normal: require('../assets/tipos/emerald/normal.png'),
+    fire: require('../assets/tipos/emerald/fire.png'),
+    water: require('../assets/tipos/emerald/water.png'),
+    electric: require('../assets/tipos/emerald/electric.png'),
+    grass: require('../assets/tipos/emerald/grass.png'),
+    ice: require('../assets/tipos/emerald/ice.png'),
+    fighting: require('../assets/tipos/emerald/fighting.png'),
+    poison: require('../assets/tipos/emerald/poison.png'),
+    ground: require('../assets/tipos/emerald/ground.png'),
+    flying: require('../assets/tipos/emerald/flying.png'),
+    psychic: require('../assets/tipos/emerald/psychic.png'),
+    bug: require('../assets/tipos/emerald/bug.png'),
+    rock: require('../assets/tipos/emerald/rock.png'),
+    ghost: require('../assets/tipos/emerald/ghost.png'),
+    dragon: require('../assets/tipos/emerald/dragon.png'),
+    dark: require('../assets/tipos/emerald/dark.png'),
+    steel: require('../assets/tipos/emerald/steel.png'),
+  },
+};

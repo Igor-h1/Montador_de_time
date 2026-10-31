@@ -1,8 +1,4 @@
-// data/capas.js
-// Capas dos jogos (imagem 480 x 640 px, retrato).
-// Para usar uma capa: salve a imagem em assets/capas/ e troque o null pela
-// linha do require (descomente). Sem capa, a Home mostra um cartão com a
-// cor e o nome do jogo.
+
 
 export const CAPAS = {
   firered: require('../assets/capas/firered.jpg'),

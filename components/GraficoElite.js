@@ -27,10 +27,16 @@ export default function GraficoElite({ analise, onSaberMais }) {
       {analise.principais.map((treinador) => (
         <View key={treinador.id} style={styles.linha}>
           <View style={styles.esquerda}>
-            <EtiquetaTreinador treinador={treinador} />
-            <Text style={styles.nome} numberOfLines={1}>
-              {treinador.nome}
-              {treinador.categoria === 'campeao' ? ' (campeão)' : ''}
+            <View style={styles.nomeLinha}>
+              <Text style={styles.nome} numberOfLines={1}>
+                {treinador.nome}
+              </Text>
+              <View style={styles.etiqueta}>
+                <EtiquetaTreinador treinador={treinador} />
+              </View>
+            </View>
+            <Text style={styles.categoria}>
+              {treinador.categoria === 'campeao' ? 'Campeão' : 'Elite dos 4'}
             </Text>
           </View>
           <Medidor quadrados={treinador.quadrados} sentido={treinador.sentido} />
@@ -84,7 +90,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   esquerda: { flex: 1, marginRight: 10 },
-  nome: { fontSize: 14, fontWeight: '700', color: COR.texto },
+  nomeLinha: { flexDirection: 'row', alignItems: 'center' },
+  nome: { fontSize: 15, fontWeight: '700', color: COR.texto, flexShrink: 1 },
+  // marginBottom negativo cancela a margem inferior da etiqueta, alinhando com o nome
+  etiqueta: { marginLeft: 6, marginBottom: -4 },
+  categoria: { fontSize: 11, color: COR.textoSuave },
   legenda: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   amostra: {
     width: 12,

@@ -10,7 +10,8 @@
 // da PokéAPI). Se a internet cair, rode de novo: continua de onde parou.
 //
 // A disponibilidade por jogo só é gravada para os jogos OFFLINE (FireRed e
-// Emerald). A lista dos jogos online é buscada pelo app, na hora.
+// Emerald): o valor é o NÚMERO do Pokémon na Pokédex regional do jogo (ou false
+// se ele não está nela). A lista dos jogos online é buscada pelo app, na hora.
 
 const fs = require('fs');
 const path = require('path');
@@ -71,8 +72,8 @@ const dormir = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Busca na API (ou no cache). "reduzir" guarda só o que o app precisa,
 // para o cache não ficar enorme.
-async function buscarComCache(caminho, reduzir) {
-  const arquivo = path.join(CACHE_DIR, caminho.replace(/[^a-z0-9]+/gi, '_') + '.json');
+async function buscarComCache(caminho, reduzir, nomeCache = caminho) {
+  const arquivo = path.join(CACHE_DIR, nomeCache.replace(/[^a-z0-9]+/gi, '_') + '.json');
   if (fs.existsSync(arquivo)) {
     return JSON.parse(fs.readFileSync(arquivo, 'utf8'));
   }
@@ -96,14 +97,19 @@ function buscarPokemon(id) {
   }));
 }
 
-// Devolve um Set com os ids da Pokédex regional
+// Devolve um Map: id do Pokémon -> número dele na Pokédex regional (entry_number)
 async function buscarPokedex(nome) {
-  const dados = await buscarComCache(`pokedex/${nome}`, (d) => ({
-    ids: d.pokemon_entries.map((e) =>
-      Number(e.pokemon_species.url.split('/').filter(Boolean).pop())
-    ),
-  }));
-  return new Set(dados.ids);
+  const dados = await buscarComCache(
+    `pokedex/${nome}`,
+    (d) => ({
+      entradas: d.pokemon_entries.map((e) => [
+        Number(e.pokemon_species.url.split('/').filter(Boolean).pop()),
+        e.entry_number,
+      ]),
+    }),
+    `pokedex-com-numeros/${nome}` // nome novo no cache: o antigo só guardava os ids
+  );
+  return new Map(dados.entradas);
 }
 
 // A API devolve os tipos ATUAIS. Usamos o campo past_types: cada entrada diz
@@ -170,13 +176,17 @@ async function main() {
 
     const disponibilidade = {};
     Object.keys(DEX_POR_JOGO).forEach((jogo) => {
-      disponibilidade[jogo] = dexPorJogo[jogo].has(id);
+      // número na Pokédex regional do jogo, ou false se o Pokémon não está nela
+      disponibilidade[jogo] = dexPorJogo[jogo].get(id) || false;
     });
 
     lista.push({ id: p.id, nome, slug, tipos, disponibilidade });
 
     if (modoTeste) {
-      console.log(`  #${p.id} ${nome} [${tipos.join(', ')}] (slug: ${slug})`);
+      console.log(
+        `  #${p.id} ${nome} [${tipos.join(', ')}] (slug: ${slug}) ` +
+          `| nº FireRed: ${disponibilidade.firered || '-'} | nº Emerald: ${disponibilidade.emerald || '-'}`
+      );
     } else if (id % 50 === 0) {
       console.log(`  ${id}/${TOTAL}`);
     }

@@ -16,6 +16,7 @@ import Equipe from './screens/Equipe';
 import Pokedex from './screens/Pokedex';
 import Detalhes from './screens/Detalhes';
 import Elite from './screens/Elite';
+import Tipos from './screens/Tipos';
 import { obterElite } from './services/eliteService';
 
 const Stack = createNativeStackNavigator();
@@ -53,6 +54,11 @@ export default function App() {
                 const pokemon = buscarPorId(route.params.pokemonId);
                 return { title: pokemon ? pokemon.nome : 'Detalhes' };
               }}
+            />
+            <Stack.Screen
+              name="Tipos"
+              component={Tipos}
+              options={{ title: 'Tipos da equipe' }}
             />
             <Stack.Screen
               name="Elite"

@@ -20,8 +20,11 @@ import {
   buscarPorId,
   obterSprite,
   estaDisponivel,
+  numeroRegionalDe,
   urlSaibaMais,
 } from '../services/pokemonService';
+
+const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
 import { useEquipe } from '../context/EquipeContext';
 
 export default function Detalhes({ navigation, route }) {
@@ -46,6 +49,7 @@ export default function Detalhes({ navigation, route }) {
   }
 
   const disponivel = estaDisponivel(pokemon.id, jogoId);
+  const numeroRegional = numeroRegionalDe(pokemon.id, jogoId);
   const jaNoTime = equipe[jogoId].includes(pokemon.id);
   const mostrarImagem = sprite && !erroImagem;
   // Fundo do topo: cor do primeiro tipo, bem clarinha (o "33" é a transparência)
@@ -96,7 +100,11 @@ export default function Detalhes({ navigation, route }) {
           )}
         </View>
 
-        <Text style={styles.numero}>#{String(pokemon.id).padStart(3, '0')}</Text>
+        <Text style={styles.numero}>
+          {numeroRegional
+            ? `${formatarNumero(numeroRegional)} · Nacional ${formatarNumero(pokemon.id)}`
+            : `Nacional ${formatarNumero(pokemon.id)}`}
+        </Text>
         <Text style={styles.nome}>{pokemon.nome}</Text>
         <View style={styles.tipos}>
           {pokemon.tipos.map((tipo) => (

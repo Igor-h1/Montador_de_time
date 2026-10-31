@@ -95,8 +95,9 @@ export default function Pokedex({ navigation, route }) {
       if (apenasDisponiveis && !p.disponivel) return false;
       if (tipoFiltro && !p.tipos.includes(tipoFiltro)) return false;
       if (termo) {
+        // número = o que aparece no Card (o da Pokédex do jogo; sem ele, o nacional)
         return buscaNumerica
-          ? p.id === Number(termo)
+          ? (p.numeroRegional || p.id) === Number(termo)
           : normalizar(p.nome).includes(termo);
       }
       return true;

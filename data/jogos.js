@@ -12,6 +12,7 @@
 //                    de disponíveis são reaproveitados. Sem esse campo, o jogo usa os próprios.
 //   pokedexRegional  Pokédex da PokéAPI que define quem está "disponível"
 //   spriteGeracao / spritePasta   pasta dos sprites na PokéAPI (e em assets/sprites/)
+//   iconeTipoPasta   (opcional) pasta dos ícones de tipo na PokéAPI, quando é diferente de spritePasta
 
 export const JOGOS = {
   // ----- OFFLINE (geração 3) -----
@@ -177,6 +178,7 @@ export const JOGOS = {
     pokedexRegional: 'updated-unova',
     spriteGeracao: 'generation-v',
     spritePasta: 'black-white',
+    iconeTipoPasta: 'black-2-white-2',
   },
   white2: {
     id: 'white2',
@@ -189,6 +191,7 @@ export const JOGOS = {
     pokedexRegional: 'updated-unova',
     spriteGeracao: 'generation-v',
     spritePasta: 'black-white',
+    iconeTipoPasta: 'black-2-white-2',
   },
 };
 

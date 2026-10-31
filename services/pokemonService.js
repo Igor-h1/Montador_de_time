@@ -44,6 +44,18 @@ function disponivelNoJogo(pokemon, jogo) {
   return Boolean(dex && dex.has(pokemon.id));
 }
 
+// Número do Pokémon na Pokédex regional do jogo (ex.: Treecko = 1 no Hoenn), ou null
+// se ele não está nela. Se o pokemons.js ainda for o formato antigo (true/false em vez
+// do número), devolve null e as telas caem para o número nacional.
+function numeroRegionalNoJogo(pokemon, jogo) {
+  if (jogo.offline) {
+    const numero = pokemon.disponibilidade[baseOffline(jogo)];
+    return typeof numero === 'number' && numero > 0 ? numero : null;
+  }
+  const dex = obterDexOnline(jogo.id);
+  return (dex && dex.get(pokemon.id)) || null;
+}
+
 // Retorna o Pokémon ou null se o nome não existir (usado pela Elite dos 4)
 export function buscarPorNome(nome) {
   return POR_NOME.get(normalizarNome(nome)) || null;
@@ -54,14 +66,22 @@ export function buscarPorId(id) {
   return POR_ID.get(Number(id)) || null;
 }
 
+// Número regional de um Pokémon em um jogo (ou null). Usado na tela de Detalhes.
+export function numeroRegionalDe(id, jogoId) {
+  const pokemon = POR_ID.get(Number(id));
+  const jogo = JOGOS[jogoId];
+  return pokemon && jogo ? numeroRegionalNoJogo(pokemon, jogo) : null;
+}
+
 export function estaDisponivel(id, jogoId) {
   const pokemon = POR_ID.get(Number(id));
   const jogo = JOGOS[jogoId];
   return Boolean(pokemon && jogo && disponivelNoJogo(pokemon, jogo));
 }
 
-// Os Pokémon que o jogo conhece (até o maxId), ordenados por id, cada um com
-// o campo "disponivel". Os indisponíveis aparecem bloqueados na Pokédex.
+// Os Pokémon que o jogo conhece (até o maxId), cada um com os campos "disponivel" e
+// "numeroRegional". Ordem: primeiro os disponíveis, na ordem da Pokédex do jogo; depois
+// os indisponíveis (bloqueados na Pokédex), por número nacional.
 // Em jogo online, devolve lista vazia até a Pokédex dele ser carregada.
 export function listarPorJogo(jogoId) {
   const jogo = JOGOS[jogoId];
@@ -70,8 +90,16 @@ export function listarPorJogo(jogoId) {
 
   if (!CACHE_POR_JOGO[jogoId]) {
     CACHE_POR_JOGO[jogoId] = POKEMONS.filter((p) => p.id <= jogo.maxId)
-      .map((p) => ({ ...p, disponivel: disponivelNoJogo(p, jogo) }))
-      .sort((a, b) => a.id - b.id);
+      .map((p) => ({
+        ...p,
+        disponivel: disponivelNoJogo(p, jogo),
+        numeroRegional: numeroRegionalNoJogo(p, jogo),
+      }))
+      .sort((a, b) => {
+        if (a.disponivel !== b.disponivel) return a.disponivel ? -1 : 1;
+        if (a.numeroRegional && b.numeroRegional) return a.numeroRegional - b.numeroRegional;
+        return a.id - b.id;
+      });
   }
   return CACHE_POR_JOGO[jogoId];
 }

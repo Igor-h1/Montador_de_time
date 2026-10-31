@@ -9,7 +9,7 @@ import { JOGOS } from '../data/jogos';
 const API = 'https://pokeapi.co/api/v2';
 const TEMPO_LIMITE_MS = 15000;
 
-// Cache em memória: { 'original-sinnoh': Set([ids]) }
+// Cache em memória: { 'original-sinnoh': Map(id do Pokémon -> número na Pokédex) }
 // Jogos que usam a mesma Pokédex (ex.: Diamond e Pearl) compartilham a lista.
 const porPokedex = {};
 // Requisições em andamento, para não pedir a mesma Pokédex duas vezes
@@ -20,7 +20,8 @@ export function dexOnlineCarregada(jogoId) {
   return Boolean(jogo && porPokedex[jogo.pokedexRegional]);
 }
 
-// Set com os ids disponíveis no jogo, ou null se ainda não foi carregado
+// Map { id do Pokémon -> número dele na Pokédex do jogo }, ou null se ainda não foi carregado.
+// Quem está no Map está disponível no jogo.
 export function obterDexOnline(jogoId) {
   const jogo = JOGOS[jogoId];
   return (jogo && porPokedex[jogo.pokedexRegional]) || null;
@@ -36,10 +37,11 @@ async function buscarPokedex(nome) {
       throw new Error(`A API respondeu ${resposta.status}`);
     }
     const dados = await resposta.json();
-    const ids = dados.pokemon_entries.map((entrada) =>
-      Number(entrada.pokemon_species.url.split('/').filter(Boolean).pop())
-    );
-    porPokedex[nome] = new Set(ids);
+    const entradas = dados.pokemon_entries.map((entrada) => [
+      Number(entrada.pokemon_species.url.split('/').filter(Boolean).pop()),
+      entrada.entry_number,
+    ]);
+    porPokedex[nome] = new Map(entradas);
     return porPokedex[nome];
   } finally {
     clearTimeout(timer);

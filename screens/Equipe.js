@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SlotEquipe from '../components/SlotEquipe';
 import BadgeTipo from '../components/BadgeTipo';
 import GraficoElite from '../components/GraficoElite';
+import Botao from '../components/Botao';
 import { JOGOS } from '../data/jogos';
 import { COR } from '../data/tema';
 import { obterSprite } from '../services/pokemonService';
@@ -94,6 +95,13 @@ export default function Equipe({ navigation, route }) {
               </View>
             ))}
           </View>
+          <View style={styles.botaoDetalhes}>
+            <Botao
+              texto="Ver detalhes"
+              variante="secundaria"
+              onPress={() => navigation.navigate('Tipos', { jogo: jogoId })}
+            />
+          </View>
         </View>
       ) : null}
 
@@ -124,4 +132,5 @@ const styles = StyleSheet.create({
   linha: { flexDirection: 'row', flexWrap: 'wrap' },
   tipoItem: { flexDirection: 'row', alignItems: 'center', marginRight: 8 },
   quantidade: { fontSize: 12, color: COR.textoSuave, marginBottom: 6, marginRight: 4 },
+  botaoDetalhes: { marginTop: 6 },
 });

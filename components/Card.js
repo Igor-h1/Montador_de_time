@@ -3,6 +3,13 @@ import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
 import { COR, SOMBRA } from '../data/tema';
 
+// Número da Pokédex do jogo (ex.: #001); quem não está nela mostra o número nacional
+function rotuloNumero(pokemon) {
+  const numero = pokemon.numeroRegional || pokemon.id;
+  const texto = '#' + String(numero).padStart(3, '0');
+  return pokemon.numeroRegional ? texto : 'Nac. ' + texto;
+}
+
 function Card({ pokemon, sprite, disponivel, onPress, style }) {
   const [erroImagem, setErroImagem] = useState(false);
   const mostrarImagem = sprite && !erroImagem;
@@ -33,7 +40,7 @@ function Card({ pokemon, sprite, disponivel, onPress, style }) {
       ) : (
         <Text style={styles.interrogacao}>?</Text>
       )}
-      <Text style={styles.numero}>#{String(pokemon.id).padStart(3, '0')}</Text>
+      <Text style={styles.numero}>{rotuloNumero(pokemon)}</Text>
       <Text style={styles.nome} numberOfLines={1}>
         {pokemon.nome}
       </Text>

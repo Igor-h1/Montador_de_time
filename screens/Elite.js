@@ -90,8 +90,12 @@ function CartaoTreinador({ treinador, temEquipe, jogoId, maisDificil, onWiki }) 
       <View style={styles.cabecaTreinador}>
         <View style={styles.esquerda}>
           <Text style={styles.categoria}>{CATEGORIAS[treinador.categoria]}</Text>
-          <Text style={styles.nomeTreinador}>{treinador.nome}</Text>
-          <EtiquetaTreinador treinador={treinador} />
+          <View style={styles.nomeLinha}>
+            <Text style={styles.nomeTreinador}>{treinador.nome}</Text>
+            <View style={styles.etiqueta}>
+              <EtiquetaTreinador treinador={treinador} />
+            </View>
+          </View>
         </View>
         {temEquipe ? <Medidor quadrados={treinador.quadrados} sentido={treinador.sentido} /> : null}
       </View>
@@ -240,7 +244,9 @@ const styles = StyleSheet.create({
   },
   esquerda: { flex: 1, marginRight: 10 },
   categoria: { fontSize: 11, color: COR.textoSuave, fontWeight: '600' },
-  nomeTreinador: { fontSize: 18, fontWeight: 'bold', color: COR.texto, marginBottom: 2 },
+  nomeLinha: { flexDirection: 'row', alignItems: 'center' },
+  nomeTreinador: { fontSize: 18, fontWeight: 'bold', color: COR.texto, flexShrink: 1 },
+  etiqueta: { marginLeft: 8, marginBottom: -4 },
   maisDificil: { color: '#B3001B', fontWeight: '600', fontSize: 12, marginBottom: 6 },
   nota: { color: COR.textoSuave, fontSize: 12, fontStyle: 'italic', marginBottom: 6 },
 
