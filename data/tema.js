@@ -3,8 +3,8 @@
 // azul da "lente" e as três luzinhas (vermelha, amarela e verde).
 
 export const COR = {
-  vermelho: '#DC0A2D',
-  vermelhoClaro: '#FDECEF',
+  vermelho: '#D0403A', // vermelho principal (mais suave que o da Pokédex clássica)
+  vermelhoClaro: '#FBEAE8',
   azul: '#28AAFD',
   amarelo: '#FFCB05',
   verde: '#3DCD3D',
@@ -24,4 +24,23 @@ export const SOMBRA = {
   shadowRadius: 8,
   shadowOffset: { width: 0, height: 3 },
   elevation: 3,
+};
+
+// Paleta do aparelho em forma de Pokédex (tela de menu)
+export const APARELHO = {
+  corpo: COR.vermelho,
+  corpoClaro: '#DC5A53',
+  borda: '#8E2A26',
+  lente: '#6FD0F5',
+  telaBorda: '#3A3F45',
+  painel: '#565B62',
+  painelBorda: '#2B2F34',
+  faixaVerde: '#92C84A',
+  lcd: '#A9D45C',
+  lcdBorda: '#4F6B25',
+  lcdTexto: '#1E3310',
+  direcional: '#2F3338',
+  seta: '#9097A0',
+  cancelar: '#E0554D',
+  confirmar: '#3FAE4F',
 };

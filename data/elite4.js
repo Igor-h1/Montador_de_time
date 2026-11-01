@@ -1,4 +1,3 @@
-// data/elite4.js
 // Elite dos 4 (e campeão) de cada jogo, com os tipos dos Pokémon NA GERAÇÃO do jogo.
 // Fonte principal: dificuldade_contra_elite_dos_4.docx (gerado a partir dele).
 // Ajustes feitos em cima do documento:

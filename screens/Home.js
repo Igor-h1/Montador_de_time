@@ -1,5 +1,5 @@
 // screens/Home.js
-// Página inicial: título, aviso de falta de internet e a lista de jogos com
+// Montar time (opção do menu): aviso de falta de internet e a lista de jogos com
 // capa e nome. Tocar em um jogo abre a Equipe dele (jogo vai por route.params).
 // - FireRed e Emerald (offline): sempre aparecem.
 // - Jogos online: só aparecem com internet; quando a conexão volta, eles
@@ -8,7 +8,6 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Cabecalho from '../components/Cabecalho';
 import CapaJogo from '../components/CapaJogo';
 import { LISTA_JOGOS } from '../data/jogos';
 import { CAPAS } from '../data/capas';
@@ -36,8 +35,6 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Cabecalho titulo="Pokédex" subtitulo="Escolha o jogo para montar sua equipe" />
-
       {online === false ? (
         <View style={styles.aviso}>
           <Text style={styles.avisoTexto}>

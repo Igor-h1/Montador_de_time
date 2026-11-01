@@ -1,6 +1,6 @@
 // App.js
 // Navegação (Stack) + Provider da equipe envolvendo o app inteiro.
-// Fluxo: Home -> Equipe -> Pokédex -> Detalhes
+// Fluxo: Menu -> Montar time (escolher o jogo) -> Equipe -> Pokédex -> Detalhes
 
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
@@ -11,6 +11,7 @@ import { EquipeProvider } from './context/EquipeContext';
 import { JOGOS } from './data/jogos';
 import { COR } from './data/tema';
 import { buscarPorId } from './services/pokemonService';
+import Menu from './screens/Menu';
 import Home from './screens/Home';
 import Equipe from './screens/Equipe';
 import Pokedex from './screens/Pokedex';
@@ -28,6 +29,7 @@ export default function App() {
         <NavigationContainer>
           <StatusBar style="light" />
           <Stack.Navigator
+            initialRouteName="Menu"
             screenOptions={{
               headerStyle: { backgroundColor: COR.vermelho },
               headerTintColor: COR.branco,
@@ -35,8 +37,9 @@ export default function App() {
               contentStyle: { backgroundColor: COR.fundo },
             }}
           >
-            {/* A Home usa o Cabecalho próprio no lugar do header */}
-            <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+            {/* O Menu é o aparelho em forma de Pokédex: não usa o header */}
+            <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }} />
+            <Stack.Screen name="MontarTime" component={Home} options={{ title: 'Escolher jogo' }} />
             <Stack.Screen
               name="Equipe"
               component={Equipe}

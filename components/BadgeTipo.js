@@ -1,26 +1,21 @@
 // components/BadgeTipo.js
-// Mostra um tipo. Usa o ÍCONE ORIGINAL do jogo da tela (ex.: o rótulo "FIRE" do
-// Emerald). Se o ícone não existir ou falhar ao carregar, mostra a etiqueta colorida
-// com emoji e nome, como antes.
+// Mostra um tipo com o ÍCONE ORIGINAL do Pokémon Diamond/Pearl (o rótulo "FIRE",
+// "WATER"...), igual em todos os jogos. Se o ícone não existir ou falhar ao
+// carregar, mostra a etiqueta colorida com emoji e nome.
 // Props: tipo (chave de data/tipos.js, ex.: 'fire'), pequeno (boolean)
-//
-// O jogo vem do route.params da tela onde o componente está, então as telas
-// não precisam passar nada.
 
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { NavigationRouteContext } from '@react-navigation/native';
 import { TIPOS } from '../data/tipos';
-import { obterIconeTipo } from '../services/iconesTipos';
+import { ICONES_TIPOS } from '../data/iconesTiposMap';
 
 export default function BadgeTipo({ tipo, pequeno = false }) {
-  const rota = useContext(NavigationRouteContext); // undefined fora de uma tela
   const [erroIcone, setErroIcone] = useState(false);
 
   const info = TIPOS[tipo];
   if (!info) return null;
 
-  const icone = erroIcone ? null : obterIconeTipo(tipo, rota && rota.params && rota.params.jogo);
+  const icone = erroIcone ? null : ICONES_TIPOS[tipo];
 
   if (icone) {
     return (
