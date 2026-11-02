@@ -2,7 +2,7 @@
 // Tela inicial: o aparelho em forma de Pokédex ocupa a tela inteira, com 3 opções
 // na tela branca.
 //  - Montar time: abre a escolha de jogo (rota 'MontarTime')
-//  - Ver Pokédex: todos os Pokémon do app (precisa de internet; vem na próxima etapa)
+//  - Ver Pokédex: todos os Pokémon do app, só para consulta (precisa de internet)
 //  - Configurações: ainda sem função
 // A tela verde mostra a descrição da opção selecionada.
 // Como usar: tocar numa opção a seleciona; tocar de novo (ou no ✓) abre.
@@ -33,7 +33,7 @@ const OPCOES = [
     nome: 'Ver Pokédex',
     descricao: 'Veja todos os Pokémon. Precisa de internet.',
     precisaInternet: true,
-    emBreve: true,
+    rota: 'PokedexGeral',
   },
   {
     id: 'config',

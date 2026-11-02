@@ -18,6 +18,8 @@ import Pokedex from './screens/Pokedex';
 import Detalhes from './screens/Detalhes';
 import Elite from './screens/Elite';
 import Tipos from './screens/Tipos';
+import PokedexGeral from './screens/PokedexGeral';
+import PokedexDetalhes from './screens/PokedexDetalhes';
 import { obterElite } from './services/eliteService';
 
 const Stack = createNativeStackNavigator();
@@ -56,6 +58,15 @@ export default function App() {
               options={({ route }) => {
                 const pokemon = buscarPorId(route.params.pokemonId);
                 return { title: pokemon ? pokemon.nome : 'Detalhes' };
+              }}
+            />
+            <Stack.Screen name="PokedexGeral" component={PokedexGeral} options={{ title: 'Pokédex' }} />
+            <Stack.Screen
+              name="PokedexDetalhes"
+              component={PokedexDetalhes}
+              options={({ route }) => {
+                const pokemon = buscarPorId(route.params.pokemonId);
+                return { title: pokemon ? pokemon.nome : 'Pokémon' };
               }}
             />
             <Stack.Screen

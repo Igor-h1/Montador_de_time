@@ -61,6 +61,11 @@ export function buscarPorNome(nome) {
   return POR_NOME.get(normalizarNome(nome)) || null;
 }
 
+// Todos os Pokémon do índice (1 a 649), em ordem de número nacional. Usado na Pokédex geral.
+export function listarTodos() {
+  return POKEMONS;
+}
+
 // Retorna o Pokémon ou null se o id não existir
 export function buscarPorId(id) {
   return POR_ID.get(Number(id)) || null;
