@@ -1,15 +1,17 @@
 // screens/Home.js
-// Montar time (opção do menu): aviso de falta de internet e a lista de jogos com
-// capa e nome. Tocar em um jogo abre a Equipe dele (jogo vai por route.params).
-// - FireRed e Emerald (offline): sempre aparecem.
-// - Jogos online: só aparecem com internet; quando a conexão volta, eles
-//   reaparecem sozinhos.
+// Montar time (opção do menu): aviso de falta de internet e os jogos separados por
+// região (data/regioes.js), cada um com capa e nome. Tocar em um jogo abre a Equipe
+// dele (jogo vai por route.params).
+// - Jogos offline (FireRed, LeafGreen, Ruby, Sapphire e Emerald): sempre aparecem.
+// - Jogos online: só aparecem com internet; quando a conexão volta, eles reaparecem
+//   sozinhos. Uma região sem nenhum jogo visível não aparece.
 
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CapaJogo from '../components/CapaJogo';
-import { LISTA_JOGOS } from '../data/jogos';
+import { JOGOS, LISTA_JOGOS } from '../data/jogos';
+import { REGIOES } from '../data/regioes';
 import { CAPAS } from '../data/capas';
 import { COR } from '../data/tema';
 import { useEquipe } from '../context/EquipeContext';
@@ -25,13 +27,28 @@ const NOMES_OFFLINE = juntarNomes(
   LISTA_JOGOS.filter((jogo) => jogo.offline).map((jogo) => jogo.nome)
 );
 
+const IDS_EM_REGIOES = new Set(REGIOES.flatMap((regiao) => regiao.jogos));
+
 export default function Home({ navigation }) {
   const { equipe, MAX_EQUIPE } = useEquipe();
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const online = useRede(); // true | false | null (ainda verificando)
 
   // Offline sempre; online só com internet
-  const jogosVisiveis = LISTA_JOGOS.filter((jogo) => jogo.offline || online === true);
+  const visivel = (jogo) => Boolean(jogo) && jogo.ativo && (jogo.offline || online === true);
+
+  // Jogos de cada região, só os visíveis
+  const grupos = REGIOES.map((regiao) => ({
+    id: regiao.id,
+    nome: regiao.nome,
+    jogos: regiao.jogos.map((id) => JOGOS[id]).filter(visivel),
+  }));
+
+  // Segurança: jogo que não está em nenhuma região vai para "Outros"
+  const outros = LISTA_JOGOS.filter((jogo) => !IDS_EM_REGIOES.has(jogo.id) && visivel(jogo));
+  if (outros.length > 0) grupos.push({ id: 'outros', nome: 'Outros', jogos: outros });
+
+  const gruposVisiveis = grupos.filter((grupo) => grupo.jogos.length > 0);
 
   return (
     <View style={styles.container}>
@@ -45,19 +62,31 @@ export default function Home({ navigation }) {
       ) : null}
 
       <ScrollView contentContainerStyle={[styles.conteudo, { paddingBottom: insets.bottom + 16 }]}>
-        <View style={styles.grade}>
-          {jogosVisiveis.map((jogo) => (
-            <CapaJogo
-              key={jogo.id}
-              jogo={jogo}
-              capa={CAPAS[jogo.id]}
-              quantidade={equipe[jogo.id].length}
-              max={MAX_EQUIPE}
-              onPress={() => navigation.navigate('Equipe', { jogo: jogo.id })}
-              style={styles.capaLargura}
-            />
-          ))}
-        </View>
+        {gruposVisiveis.map((grupo) => (
+          <View key={grupo.id} style={styles.regiao}>
+            <View style={styles.cabecaRegiao}>
+              <View style={styles.marca} />
+              <Text style={styles.nomeRegiao}>{grupo.nome}</Text>
+              <Text style={styles.contagemRegiao}>
+                {grupo.jogos.length} {grupo.jogos.length === 1 ? 'jogo' : 'jogos'}
+              </Text>
+            </View>
+
+            <View style={styles.grade}>
+              {grupo.jogos.map((jogo) => (
+                <CapaJogo
+                  key={jogo.id}
+                  jogo={jogo}
+                  capa={CAPAS[jogo.id]}
+                  quantidade={equipe[jogo.id].length}
+                  max={MAX_EQUIPE}
+                  onPress={() => navigation.navigate('Equipe', { jogo: jogo.id })}
+                  style={styles.capaLargura}
+                />
+              ))}
+            </View>
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -74,6 +103,13 @@ const styles = StyleSheet.create({
   },
   avisoTexto: { color: '#6B5200', fontSize: 13 },
   conteudo: { padding: 16, paddingTop: 20 },
+
+  regiao: { marginBottom: 8 },
+  cabecaRegiao: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  marca: { width: 5, height: 22, borderRadius: 3, backgroundColor: COR.vermelho, marginRight: 10 },
+  nomeRegiao: { fontSize: 20, fontWeight: 'bold', color: COR.texto },
+  contagemRegiao: { fontSize: 12, color: COR.textoSuave, marginLeft: 10, marginTop: 3 },
+
   grade: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   capaLargura: { width: '47%' },
 });
