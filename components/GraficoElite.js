@@ -14,18 +14,18 @@ import SeloNivel from './SeloNivel';
 import EtiquetaTreinador from './EtiquetaTreinador';
 import { COR } from '../data/tema';
 
-export default function GraficoElite({ analise, onSaberMais }) {
+export default function GraficoElite({ analise, onSaberMais, titulo }) {
   if (!analise) return null;
 
   return (
     <View style={styles.secao}>
-      <Text style={styles.titulo}>Elite dos 4 · {analise.regiao}</Text>
+      <Text style={styles.titulo}>{titulo || `Elite dos 4 · ${analise.regiao}`}</Text>
       <Text style={styles.subtitulo}>
         Como os tipos da sua equipe se saem contra cada treinador
       </Text>
 
       {analise.principais.map((treinador) => (
-        <View key={treinador.id} style={styles.linha}>
+        <View key={treinador.chave || treinador.id} style={styles.linha}>
           <View style={styles.esquerda}>
             <View style={styles.nomeLinha}>
               <Text style={styles.nome} numberOfLines={1}>
@@ -35,8 +35,8 @@ export default function GraficoElite({ analise, onSaberMais }) {
                 <EtiquetaTreinador treinador={treinador} />
               </View>
             </View>
-            <Text style={styles.categoria}>
-              {treinador.categoria === 'campeao' ? 'Campeão' : 'Elite dos 4'}
+            <Text style={styles.categoria} numberOfLines={1}>
+              {treinador.subtitulo || (treinador.categoria === 'campeao' ? 'Campeão' : 'Elite dos 4')}
             </Text>
           </View>
           <Medidor quadrados={treinador.quadrados} sentido={treinador.sentido} />

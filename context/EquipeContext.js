@@ -8,18 +8,20 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { JOGOS } from '../data/jogos';
+import { ID_LIVRE } from '../data/livre';
 import { buscarPorId, estaDisponivel } from '../services/pokemonService';
 
 export const MAX_EQUIPE = 6;
 
 const EquipeContext = createContext(null);
 
-// Gera { firered: [], emerald: [], ... } a partir de data/jogos.js
+// Gera { firered: [], emerald: [], ..., livre: [] } a partir de data/jogos.js
 function criarEquipeVazia() {
   const vazia = {};
   Object.keys(JOGOS).forEach((jogoId) => {
     vazia[jogoId] = [];
   });
+  vazia[ID_LIVRE] = []; // equipe do ambiente livre
   return vazia;
 }
 

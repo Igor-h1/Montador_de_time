@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import SpriteRemoto from './SpriteRemoto';
 import { TIPOS } from '../data/tipos';
 import { COR, SOMBRA } from '../data/tema';
 
 export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style }) {
-  const [erroImagem, setErroImagem] = useState(false);
-
   if (!pokemon) {
     return (
       <Pressable
@@ -23,7 +22,8 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
     );
   }
 
-  const mostrarImagem = sprite && !erroImagem;
+  // sprite pode ser uma imagem só (jogos) ou uma lista de fontes para tentar em ordem (ambiente livre)
+  const fontes = Array.isArray(sprite) ? sprite : sprite ? [sprite] : [];
 
   return (
     <Pressable
@@ -44,16 +44,7 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
         <Text style={styles.removerTexto}>✕</Text>
       </Pressable>
 
-      {mostrarImagem ? (
-        <Image
-          source={sprite}
-          style={styles.imagem}
-          resizeMode="contain"
-          onError={() => setErroImagem(true)}
-        />
-      ) : (
-        <Text style={styles.interrogacao}>?</Text>
-      )}
+      <SpriteRemoto fontes={fontes} style={styles.imagem} />
 
       <Text style={styles.nome} numberOfLines={1}>
         {pokemon.nome}

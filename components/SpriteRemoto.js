@@ -9,10 +9,12 @@ import { Image, Text, View, StyleSheet } from 'react-native';
 export default function SpriteRemoto({ fontes, style }) {
   const [indice, setIndice] = useState(0);
 
-  // Se o componente for reaproveitado para outro Pokémon, recomeça da primeira fonte
+  // Identifica as fontes pelo conteúdo (e não pela lista), para quem passa uma lista nova a
+  // cada render não fazer a imagem recomeçar. Se for outro Pokémon, volta à primeira fonte.
+  const chave = fontes.map((f) => (typeof f === 'object' ? f.uri : String(f))).join('|');
   useEffect(() => {
     setIndice(0);
-  }, [fontes]);
+  }, [chave]);
 
   const fonte = fontes[indice];
 

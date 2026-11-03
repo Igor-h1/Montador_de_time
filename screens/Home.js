@@ -5,13 +5,15 @@
 // - Jogos offline (FireRed, LeafGreen, Ruby, Sapphire e Emerald): sempre aparecem.
 // - Jogos online: só aparecem com internet; quando a conexão volta, eles reaparecem
 //   sozinhos. Uma região sem nenhum jogo visível não aparece.
+// - No fim fica o Ambiente livre (qualquer Pokémon, sprites da internet): só com internet.
 
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CapaJogo from '../components/CapaJogo';
 import { JOGOS, LISTA_JOGOS } from '../data/jogos';
 import { REGIOES } from '../data/regioes';
+import { ID_LIVRE, NOME_LIVRE } from '../data/livre';
 import { CAPAS } from '../data/capas';
 import { COR } from '../data/tema';
 import { useEquipe } from '../context/EquipeContext';
@@ -56,7 +58,7 @@ export default function Home({ navigation }) {
         <View style={styles.aviso}>
           <Text style={styles.avisoTexto}>
             📡 Sem internet: só {NOMES_OFFLINE} aparecem. Os outros jogos voltam quando
-            você se conectar.
+            você se conectar. O ambiente livre também precisa de internet.
           </Text>
         </View>
       ) : null}
@@ -87,6 +89,25 @@ export default function Home({ navigation }) {
             </View>
           </View>
         ))}
+
+        {online === true ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('EquipeLivre')}
+            style={({ pressed }) => [styles.livre, pressed && styles.pressionado]}
+          >
+            <Text style={styles.livreIcone}>🌍</Text>
+            <View style={styles.livreTextos}>
+              <Text style={styles.livreNome}>{NOME_LIVRE}</Text>
+              <Text style={styles.livreDescricao}>
+                Escolha qualquer Pokémon e veja como o time se sai contra o campeão de cada região.
+              </Text>
+              <Text style={styles.livreEquipe}>
+                Equipe {equipe[ID_LIVRE].length}/{MAX_EQUIPE}
+              </Text>
+            </View>
+          </Pressable>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -111,5 +132,23 @@ const styles = StyleSheet.create({
   contagemRegiao: { fontSize: 12, color: COR.textoSuave, marginLeft: 10, marginTop: 3 },
 
   grade: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  pressionado: { opacity: 0.8 },
+
+  livre: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COR.superficie,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COR.vermelho,
+    borderStyle: 'dashed',
+    padding: 14,
+    marginTop: 8,
+  },
+  livreIcone: { fontSize: 34, marginRight: 14 },
+  livreTextos: { flex: 1 },
+  livreNome: { fontSize: 18, fontWeight: 'bold', color: COR.texto },
+  livreDescricao: { fontSize: 12, color: COR.textoSuave, marginTop: 2 },
+  livreEquipe: { fontSize: 12, fontWeight: '700', color: COR.vermelho, marginTop: 6 },
   capaLargura: { width: '47%' },
 });

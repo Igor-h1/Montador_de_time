@@ -4,6 +4,8 @@
 // - Busca por nome ou número nacional
 // - Filtro por tipo
 // - Toque em um Pokémon -> PokedexDetalhes (tipos, fraquezas e "Saiba mais")
+// - Com route.params.escolher (vindo do ambiente livre), os detalhes mostram o botão de
+//   adicionar à equipe
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
@@ -20,7 +22,8 @@ function normalizar(texto) {
   return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-export default function PokedexGeral({ navigation }) {
+export default function PokedexGeral({ navigation, route }) {
+  const escolher = Boolean(route.params && route.params.escolher);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const online = useRede();
 
@@ -53,8 +56,9 @@ export default function PokedexGeral({ navigation }) {
   // useCallback mantém a mesma função entre renders; assim o React.memo
   // do card funciona e a lista rola sem redesenhar tudo.
   const aoTocarCard = useCallback(
-    (pokemon) => navigation.navigate('PokedexDetalhes', { pokemonId: pokemon.id }),
-    [navigation]
+    (pokemon) =>
+      navigation.navigate('PokedexDetalhes', { pokemonId: pokemon.id, montando: escolher }),
+    [navigation, escolher]
   );
 
   const renderItem = useCallback(

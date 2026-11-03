@@ -10,6 +10,7 @@
 
 import { POKEMONS } from '../data/pokemons';
 import { JOGOS } from '../data/jogos';
+import { ID_LIVRE } from '../data/livre';
 import { SPRITES } from '../data/spritesMap';
 import { obterDexOnline } from './pokedexOnline';
 
@@ -80,6 +81,8 @@ export function numeroRegionalDe(id, jogoId) {
 
 export function estaDisponivel(id, jogoId) {
   const pokemon = POR_ID.get(Number(id));
+  // Ambiente livre: qualquer Pokémon do índice vale
+  if (jogoId === ID_LIVRE) return Boolean(pokemon);
   const jogo = JOGOS[jogoId];
   return Boolean(pokemon && jogo && disponivelNoJogo(pokemon, jogo));
 }

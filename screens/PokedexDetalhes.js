@@ -1,7 +1,8 @@
 // screens/PokedexDetalhes.js
 // Detalhes de um Pokémon na Pokédex geral (só consulta, sem botão de equipe):
 // sprite, número nacional, tipos, fraquezas e resistências e o "Saiba mais".
-// Recebe pokemonId por route.params.
+// Recebe pokemonId por route.params. Com route.params.montando (vindo do ambiente livre)
+// mostra também o botão de adicionar/remover da equipe livre.
 
 import React, { useState } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
@@ -15,12 +16,16 @@ import { COR } from '../data/tema';
 import { buscarPorId, urlSaibaMais } from '../services/pokemonService';
 import { fontesSprite } from '../services/spritesGeral';
 import { abrirLink } from '../services/links';
+import { useEquipe } from '../context/EquipeContext';
+import { ID_LIVRE } from '../data/livre';
 
-export default function PokedexDetalhes({ route }) {
+export default function PokedexDetalhes({ navigation, route }) {
   const { pokemonId } = route.params;
   const pokemon = buscarPorId(pokemonId);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const [aviso, setAviso] = useState(null);
+  const { equipe, adicionar, remover } = useEquipe();
+  const montando = Boolean(route.params.montando); // veio do ambiente livre
 
   if (!pokemon) {
     return (
@@ -32,6 +37,22 @@ export default function PokedexDetalhes({ route }) {
 
   // Fundo do topo: cor do primeiro tipo, bem clarinha (o "33" é a transparência)
   const corTopo = TIPOS[pokemon.tipos[0]].cor + '33';
+  const jaNoTime = equipe[ID_LIVRE].includes(pokemon.id);
+
+  function aoAdicionar() {
+    const resultado = adicionar(pokemon.id, ID_LIVRE);
+    if (resultado.ok) {
+      // Equipe livre -> Pokédex -> Detalhes: volta 2 telas, para a equipe
+      navigation.pop(2);
+    } else {
+      setAviso(resultado.motivo);
+    }
+  }
+
+  function aoRemover() {
+    remover(pokemon.id, ID_LIVRE);
+    navigation.goBack();
+  }
 
   async function aoSaberMais() {
     const resultado = await abrirLink(urlSaibaMais(pokemon));
@@ -59,6 +80,14 @@ export default function PokedexDetalhes({ route }) {
           <Text style={styles.secaoTitulo}>Fraquezas e resistências</Text>
           <ListaFraquezas tipos={pokemon.tipos} />
         </View>
+
+        {montando ? (
+          jaNoTime ? (
+            <Botao texto="Remover do time" variante="perigo" onPress={aoRemover} />
+          ) : (
+            <Botao texto="Adicionar ao time" onPress={aoAdicionar} />
+          )
+        ) : null}
 
         {aviso ? <Text style={styles.faixaErro}>{aviso}</Text> : null}
 

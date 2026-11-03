@@ -13,6 +13,8 @@
 // Esta função não depende da tela nem do restante do app (recebe a equipe pronta).
 
 import { ELITE4 } from '../data/elite4';
+import { JOGOS } from '../data/jogos';
+import { REGIOES } from '../data/regioes';
 import { multiplicador } from '../data/tipos';
 
 // ---- Ajustes da estimativa (tudo aqui, para calibrar fácil) ----
@@ -111,4 +113,82 @@ export function analisarElite(jogoId, equipe) {
     .slice(0, 3);
 
   return { regiao: dados.regiao, temEquipe, treinadores, principais, posgame, dificuldade, maisDificeis };
+}
+
+// ---------------------------------------------------------------------------
+// Ambiente livre: a equipe contra TODAS as regiões (data/regioes.js).
+// Cada região reúne os conjuntos de Elite dos 4 dos seus jogos (jogos pares, como
+// Diamond e Pearl, dividem o mesmo conjunto). Devolve:
+//   regioes   [{ id, nome, conjuntos: [{ id, jogos: ['FireRed', 'LeafGreen'], treinadores }] }]
+//             com TODOS os treinadores do conjunto (Elite dos 4, campeão e pós-game)
+//   campeoes  o campeão de cada conjunto, com "subtitulo" (ex.: "Hoenn · Emerald")
+//   outros    os demais treinadores (Elite dos 4 e pós-game), também com "subtitulo"
+//   dificuldade / maisDificeis    calculados sobre os campeões (o que o gráfico mostra)
+//   maisDificeisOutros            onde a equipe mais sofre entre os "outros"
+// ---------------------------------------------------------------------------
+export function analisarEliteLivre(equipe) {
+  const temEquipe = equipe.length > 0;
+  const regioes = [];
+
+  REGIOES.forEach((regiao) => {
+    const conjuntos = [];
+    const indicePorDados = new Map(); // conjunto de dados -> posição em "conjuntos"
+
+    regiao.jogos.forEach((jogoId) => {
+      const dados = ELITE4[jogoId];
+      const jogo = JOGOS[jogoId];
+      if (!dados || !jogo) return;
+
+      if (indicePorDados.has(dados)) {
+        conjuntos[indicePorDados.get(dados)].jogos.push(jogo.nome);
+        return;
+      }
+
+      const id = `${regiao.id}-${conjuntos.length}`;
+      indicePorDados.set(dados, conjuntos.length);
+      conjuntos.push({
+        id,
+        jogos: [jogo.nome],
+        treinadores: dados.treinadores.map((t) => ({
+          ...analisarTreinador(t, equipe),
+          chave: `${id}-${t.id}`,
+        })),
+      });
+    });
+
+    if (conjuntos.length > 0) regioes.push({ id: regiao.id, nome: regiao.nome, conjuntos });
+  });
+
+  const campeoes = [];
+  const outros = [];
+  regioes.forEach((regiao) =>
+    regiao.conjuntos.forEach((conjunto) =>
+      conjunto.treinadores.forEach((t) => {
+        const comRotulo = { ...t, subtitulo: `${regiao.nome} · ${conjunto.jogos.join('/')}` };
+        (t.categoria === 'campeao' ? campeoes : outros).push(comRotulo);
+      })
+    )
+  );
+
+  let dificuldade = null;
+  if (temEquipe && campeoes.length > 0) {
+    const notaGeral = media(campeoes.map((t) => t.nota));
+    dificuldade = { ...NIVEIS.find((n) => notaGeral >= n.minimo), nota: notaGeral };
+  }
+
+  const piores = (lista) =>
+    lista
+      .filter((t) => t.sentido === 'desvantagem')
+      .sort((a, b) => a.nota - b.nota)
+      .slice(0, 3);
+
+  return {
+    temEquipe,
+    regioes,
+    campeoes,
+    outros,
+    dificuldade,
+    maisDificeis: piores(campeoes),
+    maisDificeisOutros: piores(outros),
+  };
 }

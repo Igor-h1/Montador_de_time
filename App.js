@@ -20,6 +20,10 @@ import Elite from './screens/Elite';
 import Tipos from './screens/Tipos';
 import PokedexGeral from './screens/PokedexGeral';
 import PokedexDetalhes from './screens/PokedexDetalhes';
+import EquipeLivre from './screens/EquipeLivre';
+import EliteLivre from './screens/EliteLivre';
+import EliteLivreCompleta from './screens/EliteLivreCompleta';
+import { NOME_LIVRE } from './data/livre';
 import { obterElite } from './services/eliteService';
 
 const Stack = createNativeStackNavigator();
@@ -60,7 +64,13 @@ export default function App() {
                 return { title: pokemon ? pokemon.nome : 'Detalhes' };
               }}
             />
-            <Stack.Screen name="PokedexGeral" component={PokedexGeral} options={{ title: 'Pokédex' }} />
+            <Stack.Screen
+              name="PokedexGeral"
+              component={PokedexGeral}
+              options={({ route }) => ({
+                title: route.params && route.params.escolher ? 'Escolher Pokémon' : 'Pokédex',
+              })}
+            />
             <Stack.Screen
               name="PokedexDetalhes"
               component={PokedexDetalhes}
@@ -68,6 +78,17 @@ export default function App() {
                 const pokemon = buscarPorId(route.params.pokemonId);
                 return { title: pokemon ? pokemon.nome : 'Pokémon' };
               }}
+            />
+            <Stack.Screen name="EquipeLivre" component={EquipeLivre} options={{ title: NOME_LIVRE }} />
+            <Stack.Screen
+              name="EliteLivre"
+              component={EliteLivre}
+              options={{ title: 'Campeões das regiões' }}
+            />
+            <Stack.Screen
+              name="EliteLivreCompleta"
+              component={EliteLivreCompleta}
+              options={{ title: 'Elite dos 4 e pós-game' }}
             />
             <Stack.Screen
               name="Tipos"
