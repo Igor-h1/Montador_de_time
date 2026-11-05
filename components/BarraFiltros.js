@@ -1,16 +1,19 @@
 // components/BarraFiltros.js
-// Barra de filtros: campo de busca (com lupa e botão de limpar), linha de tipos e uma
-// linha de resumo (contagem, com espaço para algo à direita).
+// Barra de filtros das Pokédex: campo de busca (com lupa e botão de limpar), linha de
+// tipos (dá para escolher VÁRIOS), seletor "Qualquer um / Todos juntos" (aparece quando há
+// 2 ou mais tipos escolhidos) e uma linha de resumo (contagem, com espaço para algo à direita).
 // Props:
-//   busca, onBusca        texto da busca e função que o altera
-//   tipoFiltro, onTipo    tipo escolhido (ou null) e função que o altera
-//   contagem              texto do resumo (ex.: "649 Pokémon")
-//   children              (opcional) conteúdo à direita do resumo
+//   busca, onBusca            texto da busca e função que o altera
+//   tiposFiltro, onTipos      lista de tipos escolhidos e função que a altera
+//   modoTipos, onModoTipos    'qualquer' | 'todos' (ver services/filtros.js) e função que o altera
+//   contagem                  texto do resumo (ex.: "649 Pokémon")
+//   children                  (opcional) conteúdo à direita do resumo
 
 import React from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { TIPOS, LISTA_TIPOS } from '../data/tipos';
 import { COR } from '../data/tema';
+import { alternarTipo, MODO_QUALQUER, MODO_TODOS } from '../services/filtros';
 
 // Etiqueta do filtro de tipo: ativa fica preenchida com a cor do tipo
 function Chip({ texto, ativo, cor, onPress }) {
@@ -27,7 +30,32 @@ function Chip({ texto, ativo, cor, onPress }) {
   );
 }
 
-export default function BarraFiltros({ busca, onBusca, tipoFiltro, onTipo, contagem, children }) {
+// Um dos dois lados do seletor de modo
+function Opcao({ texto, ativa, onPress }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: ativa }}
+      onPress={onPress}
+      style={[styles.opcao, ativa && styles.opcaoAtiva]}
+    >
+      <Text style={[styles.opcaoTexto, ativa && styles.opcaoTextoAtivo]}>{texto}</Text>
+    </Pressable>
+  );
+}
+
+export default function BarraFiltros({
+  busca,
+  onBusca,
+  tiposFiltro,
+  onTipos,
+  modoTipos,
+  onModoTipos,
+  contagem,
+  children,
+}) {
+  const varios = tiposFiltro.length >= 2;
+
   return (
     <View style={styles.filtros}>
       <View style={styles.campoBusca}>
@@ -60,17 +88,38 @@ export default function BarraFiltros({ busca, onBusca, tipoFiltro, onTipo, conta
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.chips}
       >
-        <Chip texto="Todos" ativo={tipoFiltro === null} onPress={() => onTipo(null)} />
+        <Chip texto="Todos" ativo={tiposFiltro.length === 0} onPress={() => onTipos([])} />
         {LISTA_TIPOS.map((tipo) => (
           <Chip
             key={tipo}
             texto={`${TIPOS[tipo].icone} ${TIPOS[tipo].nome}`}
-            ativo={tipoFiltro === tipo}
+            ativo={tiposFiltro.includes(tipo)}
             cor={TIPOS[tipo].cor}
-            onPress={() => onTipo(tipoFiltro === tipo ? null : tipo)}
+            onPress={() => onTipos(alternarTipo(tiposFiltro, tipo))}
           />
         ))}
       </ScrollView>
+
+      {varios ? (
+        <View style={styles.modo}>
+          <Text style={styles.modoRotulo}>Pokémon com:</Text>
+          <View style={styles.modoOpcoes}>
+            <Opcao
+              texto="Qualquer um"
+              ativa={modoTipos === MODO_QUALQUER}
+              onPress={() => onModoTipos(MODO_QUALQUER)}
+            />
+            <Opcao
+              texto="Todos juntos"
+              ativa={modoTipos === MODO_TODOS}
+              onPress={() => onModoTipos(MODO_TODOS)}
+            />
+          </View>
+          {modoTipos === MODO_TODOS && tiposFiltro.length > 2 ? (
+            <Text style={styles.modoAviso}>Nenhum Pokémon tem mais de 2 tipos.</Text>
+          ) : null}
+        </View>
+      ) : null}
 
       <View style={styles.resumo}>
         <Text style={styles.contagem}>{contagem}</Text>
@@ -112,6 +161,22 @@ const styles = StyleSheet.create({
   },
   chipTexto: { fontSize: 13, color: COR.texto, fontWeight: '600' },
   chipTextoAtivo: { color: COR.branco },
+
+  modo: { paddingHorizontal: 14, paddingBottom: 8 },
+  modoRotulo: { fontSize: 12, color: COR.textoSuave, fontWeight: '600', marginBottom: 6 },
+  modoOpcoes: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    backgroundColor: COR.superficie,
+    borderRadius: 14,
+    padding: 3,
+  },
+  opcao: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 11 },
+  opcaoAtiva: { backgroundColor: COR.vermelho },
+  opcaoTexto: { fontSize: 13, fontWeight: '600', color: COR.texto },
+  opcaoTextoAtivo: { color: COR.branco },
+  modoAviso: { fontSize: 11, color: '#B3001B', marginTop: 6 },
+
   resumo: {
     flexDirection: 'row',
     alignItems: 'center',

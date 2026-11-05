@@ -1,12 +1,13 @@
 // components/SpriteRemoto.js
 // Imagem que tenta uma lista de fontes, uma de cada vez: se a primeira falhar, passa
 // para a próxima; se todas falharem, mostra um "?".
-// Props: fontes (lista de { uri }), style (largura e altura)
+// Props: fontes (lista de { uri }), style (largura e altura),
+//        onFalha (opcional: chamado quando TODAS as fontes falharam)
 
 import React, { useState, useEffect } from 'react';
 import { Image, Text, View, StyleSheet } from 'react-native';
 
-export default function SpriteRemoto({ fontes, style }) {
+export default function SpriteRemoto({ fontes, style, onFalha }) {
   const [indice, setIndice] = useState(0);
 
   // Identifica as fontes pelo conteúdo (e não pela lista), para quem passa uma lista nova a
@@ -17,6 +18,11 @@ export default function SpriteRemoto({ fontes, style }) {
   }, [chave]);
 
   const fonte = fontes[indice];
+
+  // Avisa quem usa o componente quando acabaram as fontes
+  useEffect(() => {
+    if (fontes.length > 0 && !fonte && onFalha) onFalha();
+  }, [fonte]);
 
   if (!fonte) {
     return (

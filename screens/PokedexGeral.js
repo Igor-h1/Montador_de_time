@@ -2,7 +2,7 @@
 // Pokédex geral (opção "Ver Pokédex" do menu): todos os 649 Pokémon do app, para
 // consulta. Só é aberta com internet, porque os sprites vêm da web.
 // - Busca por nome ou número nacional
-// - Filtro por tipo
+// - Filtro por tipo (dá para escolher vários: "qualquer um" ou "todos juntos")
 // - Toque em um Pokémon -> PokedexDetalhes (tipos, fraquezas e "Saiba mais")
 // - Com route.params.escolher (vindo do ambiente livre), os detalhes mostram o botão de
 //   adicionar à equipe
@@ -16,6 +16,7 @@ import Botao from '../components/Botao';
 import { COR } from '../data/tema';
 import { listarTodos } from '../services/pokemonService';
 import useRede from '../services/useRede';
+import { passaFiltroTipos, MODO_QUALQUER } from '../services/filtros';
 
 // Minúsculas e sem acentos, para a busca não depender de maiúsculas
 function normalizar(texto) {
@@ -28,7 +29,8 @@ export default function PokedexGeral({ navigation, route }) {
   const online = useRede();
 
   const [busca, setBusca] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState(null);
+  const [tiposFiltro, setTiposFiltro] = useState([]);
+  const [modoTipos, setModoTipos] = useState(MODO_QUALQUER);
 
   const todos = useMemo(() => listarTodos(), []);
 
@@ -38,19 +40,19 @@ export default function PokedexGeral({ navigation, route }) {
     const buscaNumerica = /^\d+$/.test(termo);
 
     return todos.filter((p) => {
-      if (tipoFiltro && !p.tipos.includes(tipoFiltro)) return false;
+      if (!passaFiltroTipos(p, tiposFiltro, modoTipos)) return false;
       if (termo) {
         return buscaNumerica ? p.id === Number(termo) : normalizar(p.nome).includes(termo);
       }
       return true;
     });
-  }, [todos, busca, tipoFiltro]);
+  }, [todos, busca, tiposFiltro, modoTipos]);
 
-  const temFiltro = busca !== '' || tipoFiltro !== null;
+  const temFiltro = busca !== '' || tiposFiltro.length > 0;
 
   function limparFiltros() {
     setBusca('');
-    setTipoFiltro(null);
+    setTiposFiltro([]);
   }
 
   // useCallback mantém a mesma função entre renders; assim o React.memo
@@ -75,8 +77,10 @@ export default function PokedexGeral({ navigation, route }) {
       <BarraFiltros
         busca={busca}
         onBusca={setBusca}
-        tipoFiltro={tipoFiltro}
-        onTipo={setTipoFiltro}
+        tiposFiltro={tiposFiltro}
+        onTipos={setTiposFiltro}
+        modoTipos={modoTipos}
+        onModoTipos={setModoTipos}
         contagem={`${lista.length} Pokémon`}
       />
 

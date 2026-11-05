@@ -1,5 +1,5 @@
 // scripts/gerarDados.js
-// Gera data/pokemons.js (índice leve: id, nome, slug, tipos) a partir da PokéAPI.
+// Gera data/pokemons.js (índice leve: id, nome, slug, tipos, status base) a partir da PokéAPI.
 // Roda UMA vez no seu computador (NÃO faz parte do app). Precisa de Node 18+.
 // Rode sempre da RAIZ do projeto:
 //
@@ -89,12 +89,31 @@ async function buscarComCache(caminho, reduzir, nomeCache = caminho) {
 }
 
 function buscarPokemon(id) {
-  return buscarComCache(`pokemon/${id}`, (d) => ({
-    id: d.id,
-    name: d.name,
-    types: d.types,
-    past_types: d.past_types || [],
-  }));
+  return buscarComCache(
+    `pokemon/${id}`,
+    (d) => ({
+      id: d.id,
+      name: d.name,
+      types: d.types,
+      past_types: d.past_types || [],
+      stats: d.stats,
+    }),
+    `pokemon-com-status/${id}` // nome novo no cache: o antigo não guardava os status
+  );
+}
+
+// Os 6 status base, sempre nesta ordem (a mesma de data/stats.js):
+// HP, Ataque, Defesa, Ataque Esp., Defesa Esp. e Velocidade.
+// Atenção: a PokéAPI só tem os valores da geração mais recente; alguns Pokémon
+// tiveram ajustes depois da 5ª geração e podem diferir um pouco dos jogos.
+const ORDEM_STATUS = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
+
+function statusDoPokemon(pokemon) {
+  return ORDEM_STATUS.map((nome) => {
+    const item = (pokemon.stats || []).find((s) => s.stat.name === nome);
+    if (!item) throw new Error(`#${pokemon.id} ${pokemon.name} sem o status "${nome}"`);
+    return item.base_stat;
+  });
 }
 
 // Devolve um Map: id do Pokémon -> número dele na Pokédex regional (entry_number)
@@ -180,11 +199,12 @@ async function main() {
       disponibilidade[jogo] = dexPorJogo[jogo].get(id) || false;
     });
 
-    lista.push({ id: p.id, nome, slug, tipos, disponibilidade });
+    const stats = statusDoPokemon(p);
+    lista.push({ id: p.id, nome, slug, tipos, stats, disponibilidade });
 
     if (modoTeste) {
       console.log(
-        `  #${p.id} ${nome} [${tipos.join(', ')}] (slug: ${slug}) ` +
+        `  #${p.id} ${nome} [${tipos.join(', ')}] status ${stats.join('/')} (slug: ${slug}) ` +
           `| nº FireRed: ${disponibilidade.firered || '-'} | nº Emerald: ${disponibilidade.emerald || '-'}`
       );
     } else if (id % 50 === 0) {

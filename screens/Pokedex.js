@@ -3,50 +3,27 @@
 // Aberta a partir de um quadrado vazio da Equipe, para escolher um Pokémon.
 // - Jogo online: primeiro carrega a lista do jogo na API (com carregando/erro)
 // - Busca por nome ou número
-// - Filtro por tipo (chips) e chave "Só disponíveis" (ligada por padrão)
+// - Filtro por tipo (dá para escolher vários: "qualquer um" ou "todos juntos") e chave
+//   "Só disponíveis" (ligada por padrão)
 // - Toque em um Pokémon disponível -> Detalhes (pokemonId + jogo)
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  ScrollView,
-  Pressable,
-  Switch,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, FlatList, Switch, ActivityIndicator, StyleSheet } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Botao from '../components/Botao';
+import BarraFiltros from '../components/BarraFiltros';
 import { JOGOS } from '../data/jogos';
-import { TIPOS, LISTA_TIPOS } from '../data/tipos';
 import { COR } from '../data/tema';
 import { listarPorJogo, obterSprite } from '../services/pokemonService';
 import { carregarPokedexOnline, dexOnlineCarregada } from '../services/pokedexOnline';
 import useRede from '../services/useRede';
+import { passaFiltroTipos, MODO_QUALQUER } from '../services/filtros';
 
 // Minúsculas e sem acentos, para a busca não depender de maiúsculas
 function normalizar(texto) {
   return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
-
-// Etiqueta do filtro de tipo: ativa fica preenchida com a cor do tipo
-function Chip({ texto, ativo, cor, onPress }) {
-  const corAtiva = cor || COR.vermelho;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: ativo }}
-      onPress={onPress}
-      style={[styles.chip, ativo && { backgroundColor: corAtiva, borderColor: corAtiva }]}
-    >
-      <Text style={[styles.chipTexto, ativo && styles.chipTextoAtivo]}>{texto}</Text>
-    </Pressable>
-  );
 }
 
 export default function Pokedex({ navigation, route }) {
@@ -56,7 +33,8 @@ export default function Pokedex({ navigation, route }) {
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   const [busca, setBusca] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState(null);
+  const [tiposFiltro, setTiposFiltro] = useState([]);
+  const [modoTipos, setModoTipos] = useState(MODO_QUALQUER);
   const [apenasDisponiveis, setApenasDisponiveis] = useState(true); // já começa ligado
 
   // Jogos offline já têm a lista; os online precisam buscá-la na API
@@ -93,7 +71,7 @@ export default function Pokedex({ navigation, route }) {
 
     return todos.filter((p) => {
       if (apenasDisponiveis && !p.disponivel) return false;
-      if (tipoFiltro && !p.tipos.includes(tipoFiltro)) return false;
+      if (!passaFiltroTipos(p, tiposFiltro, modoTipos)) return false;
       if (termo) {
         // número = o que aparece no Card (o da Pokédex do jogo; sem ele, o nacional)
         return buscaNumerica
@@ -102,14 +80,14 @@ export default function Pokedex({ navigation, route }) {
       }
       return true;
     });
-  }, [todos, busca, tipoFiltro, apenasDisponiveis]);
+  }, [todos, busca, tiposFiltro, modoTipos, apenasDisponiveis]);
 
   // "Só disponíveis" é o padrão, então não conta como filtro ativo
-  const temFiltro = busca !== '' || tipoFiltro !== null;
+  const temFiltro = busca !== '' || tiposFiltro.length > 0;
 
   function limparFiltros() {
     setBusca('');
-    setTipoFiltro(null);
+    setTiposFiltro([]);
   }
 
   // useCallback mantém a mesma função entre renders; assim o React.memo
@@ -161,69 +139,25 @@ export default function Pokedex({ navigation, route }) {
         <Text style={styles.aviso}>📡 Sem internet: alguns sprites podem não aparecer.</Text>
       ) : null}
 
-      <View style={styles.filtros}>
-        {/* Campo de busca com lupa e botão de limpar */}
-        <View style={styles.campoBusca}>
-          <Text style={styles.lupa}>🔍</Text>
-          <TextInput
-            style={styles.busca}
-            placeholder="Buscar por nome ou número"
-            placeholderTextColor="#9CA3AF"
-            value={busca}
-            onChangeText={setBusca}
-            autoCorrect={false}
-            autoCapitalize="none"
-            returnKeyType="search"
+      <BarraFiltros
+        busca={busca}
+        onBusca={setBusca}
+        tiposFiltro={tiposFiltro}
+        onTipos={setTiposFiltro}
+        modoTipos={modoTipos}
+        onModoTipos={setModoTipos}
+        contagem={`${lista.length} Pokémon`}
+      >
+        <View style={styles.alternar}>
+          <Text style={styles.alternarTexto}>Só disponíveis</Text>
+          <Switch
+            value={apenasDisponiveis}
+            onValueChange={setApenasDisponiveis}
+            trackColor={{ false: '#D1D5DB', true: COR.vermelho }}
+            thumbColor={COR.branco}
           />
-          {busca !== '' ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Limpar busca"
-              onPress={() => setBusca('')}
-              hitSlop={10}
-            >
-              <Text style={styles.limparBusca}>✕</Text>
-            </Pressable>
-          ) : null}
         </View>
-
-        {/* Tipos */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.chips}
-        >
-          <Chip
-            texto="Todos"
-            ativo={tipoFiltro === null}
-            onPress={() => setTipoFiltro(null)}
-          />
-          {LISTA_TIPOS.map((tipo) => (
-            <Chip
-              key={tipo}
-              texto={`${TIPOS[tipo].icone} ${TIPOS[tipo].nome}`}
-              ativo={tipoFiltro === tipo}
-              cor={TIPOS[tipo].cor}
-              onPress={() => setTipoFiltro(tipoFiltro === tipo ? null : tipo)}
-            />
-          ))}
-        </ScrollView>
-
-        {/* Contagem e chave "Só disponíveis" */}
-        <View style={styles.resumo}>
-          <Text style={styles.contagem}>{lista.length} Pokémon</Text>
-          <View style={styles.alternar}>
-            <Text style={styles.alternarTexto}>Só disponíveis</Text>
-            <Switch
-              value={apenasDisponiveis}
-              onValueChange={setApenasDisponiveis}
-              trackColor={{ false: '#D1D5DB', true: COR.vermelho }}
-              thumbColor={COR.branco}
-            />
-          </View>
-        </View>
-      </View>
+      </BarraFiltros>
 
       <FlatList
         data={lista}
@@ -268,45 +202,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // Barra de filtros
-  filtros: {
-    backgroundColor: COR.branco,
-    paddingTop: 12,
-    paddingBottom: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: COR.borda,
-  },
-  campoBusca: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COR.superficie,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    marginHorizontal: 12,
-    height: 46,
-  },
-  lupa: { fontSize: 16, marginRight: 8 },
-  busca: { flex: 1, fontSize: 16, color: COR.texto, paddingVertical: 0 },
-  limparBusca: { fontSize: 16, color: COR.textoSuave, paddingLeft: 8 },
-  chips: { paddingHorizontal: 12, paddingVertical: 10 },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: COR.borda,
-    backgroundColor: COR.branco,
-    marginRight: 8,
-  },
-  chipTexto: { fontSize: 13, color: COR.texto, fontWeight: '600' },
-  chipTextoAtivo: { color: COR.branco },
-  resumo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-  },
-  contagem: { fontSize: 13, color: COR.textoSuave, fontWeight: '600' },
   alternar: { flexDirection: 'row', alignItems: 'center' },
   alternarTexto: { fontSize: 13, color: COR.texto, fontWeight: '600', marginRight: 6 },
 

@@ -6,13 +6,16 @@
 // Fluxo: Equipe -> Pokédex -> Detalhes. Ao adicionar com sucesso, volta direto
 // para a Equipe (navigation.pop(2)).
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, Image, Linking, StyleSheet } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Botao from '../components/Botao';
 import BadgeTipo from '../components/BadgeTipo';
 import ListaFraquezas from '../components/ListaFraquezas';
+import StatusBase from '../components/StatusBase';
+import BotaoShiny from '../components/BotaoShiny';
+import SpriteRemoto from '../components/SpriteRemoto';
 import { JOGOS } from '../data/jogos';
 import { TIPOS } from '../data/tipos';
 import { COR } from '../data/tema';
@@ -23,9 +26,11 @@ import {
   numeroRegionalDe,
   urlSaibaMais,
 } from '../services/pokemonService';
+import { fontesShiny } from '../services/shiny';
+import useRede from '../services/useRede';
+import { useEquipe } from '../context/EquipeContext';
 
 const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
-import { useEquipe } from '../context/EquipeContext';
 
 export default function Detalhes({ navigation, route }) {
   const { pokemonId, jogo: jogoId } = route.params;
@@ -39,6 +44,12 @@ export default function Detalhes({ navigation, route }) {
   const [erroImagem, setErroImagem] = useState(false);
   // aviso = { tipo: 'ok' | 'erro', texto: '...' } ou null
   const [aviso, setAviso] = useState(null);
+  // Shiny: só existe na internet. Ao perder a conexão, volta ao sprite normal.
+  const online = useRede();
+  const [shiny, setShiny] = useState(false);
+  useEffect(() => {
+    if (online === false) setShiny(false);
+  }, [online]);
 
   if (!pokemon) {
     return (
@@ -54,6 +65,11 @@ export default function Detalhes({ navigation, route }) {
   const mostrarImagem = sprite && !erroImagem;
   // Fundo do topo: cor do primeiro tipo, bem clarinha (o "33" é a transparência)
   const corTopo = TIPOS[pokemon.tipos[0]].cor + '33';
+
+  function aoFalharShiny() {
+    setShiny(false);
+    setAviso({ tipo: 'erro', texto: 'Não foi possível carregar o shiny.' });
+  }
 
   function aoAdicionar() {
     const resultado = adicionar(pokemon.id, jogoId);
@@ -88,7 +104,13 @@ export default function Detalhes({ navigation, route }) {
     <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 16 }]}>
       <View style={[styles.topo, { backgroundColor: corTopo }]}>
         <View style={styles.circulo}>
-          {mostrarImagem ? (
+          {shiny ? (
+            <SpriteRemoto
+              fontes={fontesShiny(pokemon.id, jogoId)}
+              style={styles.sprite}
+              onFalha={aoFalharShiny}
+            />
+          ) : mostrarImagem ? (
             <Image
               source={sprite}
               style={styles.sprite}
@@ -112,12 +134,15 @@ export default function Detalhes({ navigation, route }) {
           ))}
         </View>
         <Text style={styles.jogo}>{jogo.nome}</Text>
+        <BotaoShiny ativo={shiny} desabilitado={online === false} onPress={() => setShiny(!shiny)} />
       </View>
 
       <View style={styles.conteudo}>
         {!disponivel ? (
           <Text style={[styles.faixa, styles.erro]}>🔒 Não disponível no {jogo.nome}</Text>
         ) : null}
+
+        <StatusBase stats={pokemon.stats} />
 
         <View style={styles.secao}>
           <Text style={styles.secaoTitulo}>Fraquezas e resistências</Text>
