@@ -14,6 +14,7 @@ import Botao from '../components/Botao';
 import BadgeTipo from '../components/BadgeTipo';
 import ListaFraquezas from '../components/ListaFraquezas';
 import StatusBase from '../components/StatusBase';
+import Evolucao from '../components/Evolucao';
 import BotaoShiny from '../components/BotaoShiny';
 import SpriteRemoto from '../components/SpriteRemoto';
 import { JOGOS } from '../data/jogos';
@@ -28,6 +29,7 @@ import {
 } from '../services/pokemonService';
 import { fontesShiny } from '../services/shiny';
 import useRede from '../services/useRede';
+import { obterEvolucao, temDadosEvolucao } from '../services/evolucoes';
 import { useEquipe } from '../context/EquipeContext';
 
 const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
@@ -61,10 +63,24 @@ export default function Detalhes({ navigation, route }) {
 
   const disponivel = estaDisponivel(pokemon.id, jogoId);
   const numeroRegional = numeroRegionalDe(pokemon.id, jogoId);
+  // Evolução, só com o que existe neste jogo (até o maxId). Sem os dados gerados, não mostra o cartão.
+  const evolucao = temDadosEvolucao() ? obterEvolucao(pokemon.id, jogo.maxId) : null;
   const jaNoTime = equipe[jogoId].includes(pokemon.id);
   const mostrarImagem = sprite && !erroImagem;
   // Fundo do topo: cor do primeiro tipo, bem clarinha (o "33" é a transparência)
   const corTopo = TIPOS[pokemon.tipos[0]].cor + '33';
+
+  // Troca o Pokémon da tela. O replace mantém a mesma profundidade da pilha, então o botão
+  // de adicionar continua voltando direto para a Equipe.
+  function abrirPokemon(outro) {
+    navigation.replace('Detalhes', { pokemonId: outro.id, jogo: jogoId });
+  }
+
+  // Sprite dos Pokémon da evolução: o do jogo da tela
+  function fontesDoJogo(outro) {
+    const sprite = obterSprite(outro.id, jogoId);
+    return sprite ? [sprite] : [];
+  }
 
   function aoFalharShiny() {
     setShiny(false);
@@ -143,6 +159,13 @@ export default function Detalhes({ navigation, route }) {
         ) : null}
 
         <StatusBase stats={pokemon.stats} />
+
+        <Evolucao
+          dados={evolucao}
+          onAbrir={abrirPokemon}
+          fontesDe={fontesDoJogo}
+          bloqueado={(outro) => !estaDisponivel(outro.id, jogoId)}
+        />
 
         <View style={styles.secao}>
           <Text style={styles.secaoTitulo}>Fraquezas e resistências</Text>

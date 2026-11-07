@@ -11,6 +11,7 @@ import Botao from '../components/Botao';
 import BadgeTipo from '../components/BadgeTipo';
 import ListaFraquezas from '../components/ListaFraquezas';
 import StatusBase from '../components/StatusBase';
+import Evolucao from '../components/Evolucao';
 import BotaoShiny from '../components/BotaoShiny';
 import SpriteRemoto from '../components/SpriteRemoto';
 import { TIPOS } from '../data/tipos';
@@ -18,6 +19,7 @@ import { COR } from '../data/tema';
 import { buscarPorId, urlSaibaMais } from '../services/pokemonService';
 import { fontesSprite, fontesSpriteShiny } from '../services/spritesGeral';
 import useRede from '../services/useRede';
+import { obterEvolucao, temDadosEvolucao } from '../services/evolucoes';
 import { abrirLink } from '../services/links';
 import { useEquipe } from '../context/EquipeContext';
 import { ID_LIVRE } from '../data/livre';
@@ -47,6 +49,17 @@ export default function PokedexDetalhes({ navigation, route }) {
   // Fundo do topo: cor do primeiro tipo, bem clarinha (o "33" é a transparência)
   const corTopo = TIPOS[pokemon.tipos[0]].cor + '33';
   const jaNoTime = equipe[ID_LIVRE].includes(pokemon.id);
+  // Evolução (a Pokédex geral conhece os 649). Sem os dados gerados, não mostra o cartão.
+  const evolucao = temDadosEvolucao() ? obterEvolucao(pokemon.id) : null;
+
+  // Abre outro Pokémon. Vindo do ambiente livre (montando), troca a tela no lugar (replace),
+  // para o botão de adicionar continuar voltando direto para a equipe. Na consulta, empilha
+  // (push), e o botão de voltar leva ao Pokémon anterior.
+  function abrirPokemon(outro) {
+    const params = { pokemonId: outro.id, montando };
+    if (montando) navigation.replace('PokedexDetalhes', params);
+    else navigation.push('PokedexDetalhes', params);
+  }
 
   function aoFalharShiny() {
     setShiny(false);
@@ -96,6 +109,12 @@ export default function PokedexDetalhes({ navigation, route }) {
 
       <View style={styles.conteudo}>
         <StatusBase stats={pokemon.stats} />
+
+        <Evolucao
+          dados={evolucao}
+          onAbrir={abrirPokemon}
+          fontesDe={(outro) => fontesSprite(outro.id)}
+        />
 
         <View style={styles.secao}>
           <Text style={styles.secaoTitulo}>Fraquezas e resistências</Text>
