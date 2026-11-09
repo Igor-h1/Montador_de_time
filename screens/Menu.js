@@ -1,15 +1,16 @@
 // screens/Menu.js
-// Tela inicial: o aparelho em forma de Pokédex ocupa a tela inteira, com 3 opções
+// Tela inicial: o aparelho em forma de Pokédex ocupa a tela inteira, com 4 opções
 // na tela branca.
 //  - Montar time: abre a escolha de jogo (rota 'MontarTime')
 //  - Ver Pokédex: todos os Pokémon do app, só para consulta (precisa de internet)
+//  - Informações: direitos autorais, como o app usa as APIs e o contexto do app
 //  - Configurações: ainda sem função
 // A tela verde mostra a descrição da opção selecionada.
 // Como usar: tocar numa opção a seleciona; tocar de novo (ou no ✓) abre.
 // O direcional sobe e desce a seleção. Os sons ficam em data/sons.js.
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AparelhoPokedex from '../components/AparelhoPokedex';
 import { COR, APARELHO } from '../data/tema';
@@ -36,6 +37,13 @@ const OPCOES = [
     rota: 'PokedexGeral',
   },
   {
+    id: 'info',
+    icone: 'ℹ️',
+    nome: 'Informações',
+    descricao: 'Direitos autorais, APIs e o porquê do app.',
+    rota: 'Informacoes',
+  },
+  {
     id: 'config',
     icone: '⚙️',
     nome: 'Configurações',
@@ -56,6 +64,15 @@ export default function Menu({ navigation }) {
   useEffect(() => {
     precarregarSons();
   }, []);
+
+  // Em telas pequenas as opções rolam; o direcional leva a rolagem até a opção selecionada
+  const rolagem = useRef(null);
+  const posicoes = useRef({});
+  useEffect(() => {
+    if (rolagem.current) {
+      rolagem.current.scrollTo({ y: Math.max(0, (posicoes.current[indice] || 0) - 4), animated: true });
+    }
+  }, [indice]);
 
   const opcao = OPCOES[indice];
   const semInternet = Boolean(opcao.precisaInternet) && online === false;
@@ -122,6 +139,7 @@ export default function Menu({ navigation }) {
       >
         <Text style={styles.tituloTela}>MENU</Text>
 
+        <ScrollView ref={rolagem} showsVerticalScrollIndicator={false}>
         {OPCOES.map((o, i) => {
           const selecionada = i === indice;
           const bloqueada = Boolean(o.precisaInternet) && online === false;
@@ -137,6 +155,9 @@ export default function Menu({ navigation }) {
           return (
             <Pressable
               key={o.id}
+              onLayout={(evento) => {
+                posicoes.current[i] = evento.nativeEvent.layout.y;
+              }}
               accessibilityRole="button"
               accessibilityState={{ selected: selecionada, disabled: bloqueada }}
               onPress={() => aoTocarOpcao(i)}
@@ -160,6 +181,7 @@ export default function Menu({ navigation }) {
             </Pressable>
           );
         })}
+        </ScrollView>
       </AparelhoPokedex>
     </View>
   );
@@ -183,9 +205,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 2,
     borderColor: COR.borda,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 14,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   opcaoSelecionada: { borderColor: COR.vermelho, backgroundColor: COR.vermelhoClaro },
   opcaoBloqueada: { opacity: 0.5 },

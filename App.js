@@ -23,6 +23,9 @@ import PokedexDetalhes from './screens/PokedexDetalhes';
 import EquipeLivre from './screens/EquipeLivre';
 import EliteLivre from './screens/EliteLivre';
 import EliteLivreCompleta from './screens/EliteLivreCompleta';
+import Informacoes from './screens/Informacoes';
+import InformacaoTexto from './screens/InformacaoTexto';
+import { buscarInformacao } from './data/informacoes';
 import { NOME_LIVRE } from './data/livre';
 import { obterElite } from './services/eliteService';
 
@@ -89,6 +92,15 @@ export default function App() {
               name="EliteLivreCompleta"
               component={EliteLivreCompleta}
               options={{ title: 'Elite dos 4 e pós-game' }}
+            />
+            <Stack.Screen name="Informacoes" component={Informacoes} options={{ title: 'Informações' }} />
+            <Stack.Screen
+              name="InformacaoTexto"
+              component={InformacaoTexto}
+              options={({ route }) => {
+                const secao = buscarInformacao(route.params.secao);
+                return { title: secao ? secao.titulo : 'Informações' };
+              }}
             />
             <Stack.Screen
               name="Tipos"
