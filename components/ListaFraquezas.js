@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
 import { calcularFraquezas } from '../data/tipos';
+import { useEstilos } from '../services/tema';
 
 const GRUPOS = [
   { chave: 'x4', titulo: 'Muito fraco (4×)' },
@@ -16,6 +17,7 @@ const GRUPOS = [
 ];
 
 export default function ListaFraquezas({ tipos }) {
+  const styles = useEstilos(criarEstilos);
   // Só recalcula quando os tipos mudam
   const fraquezas = useMemo(() => calcularFraquezas(tipos), [tipos]);
 
@@ -40,8 +42,8 @@ export default function ListaFraquezas({ tipos }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   grupo: { marginBottom: 8 },
-  titulo: { fontSize: 13, fontWeight: '600', color: '#555', marginBottom: 4 },
+  titulo: { fontSize: 13, fontWeight: '600', color: COR.textoSuave, marginBottom: 4 },
   linha: { flexDirection: 'row', flexWrap: 'wrap' },
 });

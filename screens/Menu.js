@@ -4,7 +4,7 @@
 //  - Montar time: abre a escolha de jogo (rota 'MontarTime')
 //  - Ver Pokédex: todos os Pokémon do app, só para consulta (precisa de internet)
 //  - Informações: direitos autorais, como o app usa as APIs e o contexto do app
-//  - Configurações: som e modo offline (simulado)
+//  - Configurações: som, modo escuro e modo offline (simulado)
 // A tela verde mostra a descrição da opção selecionada.
 // Como usar: tocar numa opção a seleciona; tocar de novo (ou no ✓) abre.
 // O direcional sobe e desce a seleção. Os sons ficam em data/sons.js.
@@ -13,7 +13,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AparelhoPokedex from '../components/AparelhoPokedex';
-import { COR, APARELHO } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { NOME_APP } from '../data/app';
 import { ICONES_MENU } from '../data/iconesMenu';
 import { precarregarSons, tocarSom } from '../services/sons';
@@ -48,12 +48,13 @@ const OPCOES = [
     id: 'config',
     icone: '⚙️',
     nome: 'Configurações',
-    descricao: 'Som e modo offline.',
+    descricao: 'Som, modo escuro e modo offline.',
     rota: 'Configuracoes',
   },
 ];
 
 export default function Menu({ navigation }) {
+  const styles = useEstilos(criarEstilos);
   const insets = useSafeAreaInsets();
   const online = useRede(); // true | false | null (ainda verificando)
   const { modoOffline } = useConfiguracoes();
@@ -189,7 +190,7 @@ export default function Menu({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR, APARELHO) => StyleSheet.create({
   container: { flex: 1, backgroundColor: APARELHO.corpo },
 
   tituloTela: {

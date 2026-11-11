@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
-import { COR, SOMBRA } from '../data/tema';
+import { SOMBRA } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSomPokemon } from '../services/sons';
 
 // Número da Pokédex do jogo (ex.: #001); quem não está nela mostra o número nacional
@@ -12,6 +13,7 @@ function rotuloNumero(pokemon) {
 }
 
 function Card({ pokemon, sprite, disponivel, onPress, style }) {
+  const styles = useEstilos(criarEstilos);
   const [erroImagem, setErroImagem] = useState(false);
   const mostrarImagem = sprite && !erroImagem;
 
@@ -59,12 +61,12 @@ function Card({ pokemon, sprite, disponivel, onPress, style }) {
 
 export default React.memo(Card);
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   card: {
     minHeight: 190,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COR.borda,
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
   indisponivel: { opacity: 0.65 },
   pressionado: { opacity: 0.75 },
   cadeado: { position: 'absolute', top: 8, right: 8, zIndex: 1 },
-  sprite: { width: 100, height: 100 },
+  sprite: { width: 100, height: 100, borderRadius: 12, backgroundColor: COR.placaSprite },
   interrogacao: { height: 100, textAlignVertical: 'center', fontSize: 48, color: '#B0B5BD' },
   numero: { color: COR.textoSuave, fontSize: 12 },
   nome: { color: COR.texto, fontSize: 16, fontWeight: '700', marginTop: 2 },

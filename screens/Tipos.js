@@ -8,15 +8,13 @@ import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BadgeTipo from '../components/BadgeTipo';
 import Medidor from '../components/Medidor';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 import { analisarTipos } from '../services/tiposService';
 import { useEquipe } from '../context/EquipeContext';
 
-const VERDE = '#1F7A35';
-const VERMELHO = '#B3001B';
-
 // "Fracos: Blaziken, Manectric" (some se a lista estiver vazia)
 function Detalhe({ rotulo, nomes, cor }) {
+  const styles = useEstilos(criarEstilos);
   if (nomes.length === 0) return null;
   return (
     <Text style={[styles.detalhe, { color: cor }]}>
@@ -27,6 +25,8 @@ function Detalhe({ rotulo, nomes, cor }) {
 }
 
 function LinhaTipo({ linha }) {
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.cartao}>
       <View style={styles.alinharEsquerda}>
@@ -56,11 +56,11 @@ function LinhaTipo({ linha }) {
         </View>
       </View>
 
-      <Detalhe rotulo="Fracos" nomes={linha.fracos} cor={VERMELHO} />
-      <Detalhe rotulo="Resistem" nomes={linha.resistem} cor={VERDE} />
-      <Detalhe rotulo="Imunes" nomes={linha.imunes} cor={VERDE} />
+      <Detalhe rotulo="Fracos" nomes={linha.fracos} cor={COR.vermelhoTexto} />
+      <Detalhe rotulo="Resistem" nomes={linha.resistem} cor={COR.verdeTexto} />
+      <Detalhe rotulo="Imunes" nomes={linha.imunes} cor={COR.verdeTexto} />
       {linha.atacamBem.length > 0 ? (
-        <Detalhe rotulo="Atacam bem" nomes={linha.atacamBem} cor={VERDE} />
+        <Detalhe rotulo="Atacam bem" nomes={linha.atacamBem} cor={COR.verdeTexto} />
       ) : (
         <Text style={[styles.detalhe, { color: COR.textoSuave }]}>
           Nenhum Pokémon seu acerta esse tipo em cheio.
@@ -71,6 +71,7 @@ function LinhaTipo({ linha }) {
 }
 
 export default function Tipos({ route }) {
+  const styles = useEstilos(criarEstilos);
   const jogoId = route.params.jogo;
   const insets = useSafeAreaInsets();
   const { pokemonsDaEquipe } = useEquipe();
@@ -133,7 +134,7 @@ export default function Tipos({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   centro: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   suave: { color: COR.textoSuave, textAlign: 'center' },
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
 
   secao: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginTop: 16, marginBottom: 8 },
   cartao: {
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COR.borda,

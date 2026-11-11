@@ -3,6 +3,7 @@
 // a persistência entra numa etapa futura).
 //   somAtivo      true  = os sons tocam
 //   modoOffline   false = usa a internet de verdade; true = SIMULA estar sem internet
+//   modoEscuro    false = tema claro; true = tema escuro (ver services/tema.js)
 // Uso:
 //   const { somAtivo, modoOffline } = useConfiguracoes();   // em componentes (re-renderiza)
 //   obterConfiguracoes().modoOffline                         // fora de componentes
@@ -12,7 +13,7 @@ import { useState, useEffect } from 'react';
 
 // O objeto é sempre SUBSTITUÍDO (nunca alterado), então quem guarda uma referência
 // consegue perceber a mudança.
-let estado = { somAtivo: true, modoOffline: false };
+let estado = { somAtivo: true, modoOffline: false, modoEscuro: false };
 const ouvintes = new Set();
 
 export function obterConfiguracoes() {

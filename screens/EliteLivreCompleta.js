@@ -8,7 +8,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, SectionList, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CartaoTreinador from '../components/CartaoTreinador';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { ID_LIVRE } from '../data/livre';
 import { analisarEliteLivre } from '../services/eliteService';
 import { buscarPorNome } from '../services/pokemonService';
@@ -17,6 +17,7 @@ import { abrirLink, urlWiki } from '../services/links';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function EliteLivreCompleta() {
+  const styles = useEstilos(criarEstilos);
   const insets = useSafeAreaInsets();
   const { pokemonsDaEquipe } = useEquipe();
   const [aviso, setAviso] = useState(null);
@@ -81,7 +82,7 @@ export default function EliteLivreCompleta() {
         <Text style={styles.nomeJogos}>{section.jogos}</Text>
       </View>
     ),
-    []
+    [styles]
   );
 
   const cabecalho = (
@@ -130,7 +131,7 @@ export default function EliteLivreCompleta() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   lista: { backgroundColor: COR.fundo },
   conteudo: { padding: 16 },
 
@@ -139,8 +140,8 @@ const styles = StyleSheet.create({
   resumoTexto: { color: COR.texto, marginBottom: 8 },
   aviso: { fontSize: 11, color: COR.textoSuave },
   faixaErro: {
-    backgroundColor: '#F8D7DA',
-    color: '#842029',
+    backgroundColor: COR.erroFundo,
+    color: COR.erroTexto,
     padding: 10,
     borderRadius: 10,
     textAlign: 'center',

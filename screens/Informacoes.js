@@ -6,10 +6,12 @@ import React from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { INFORMACOES } from '../data/informacoes';
-import { COR, SOMBRA } from '../data/tema';
+import { SOMBRA } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSom } from '../services/sons';
 
 export default function Informacoes({ navigation }) {
+  const styles = useEstilos(criarEstilos);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   return (
@@ -38,13 +40,13 @@ export default function Informacoes({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   intro: { fontSize: 14, color: COR.textoSuave, marginBottom: 14 },
   cartao: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COR.borda,

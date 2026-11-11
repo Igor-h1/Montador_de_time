@@ -13,13 +13,14 @@ import SlotEquipe from '../components/SlotEquipe';
 import BadgeTipo from '../components/BadgeTipo';
 import GraficoElite from '../components/GraficoElite';
 import Botao from '../components/Botao';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { ID_LIVRE, NOME_LIVRE } from '../data/livre';
 import { fontesSprite } from '../services/spritesGeral';
 import { analisarEliteLivre } from '../services/eliteService';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function EquipeLivre({ navigation }) {
+  const styles = useEstilos(criarEstilos);
   const { pokemonsDaEquipe, remover, MAX_EQUIPE } = useEquipe();
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
@@ -123,7 +124,7 @@ export default function EquipeLivre({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   topo: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   marca: { width: 6, height: 44, borderRadius: 3, marginRight: 12, backgroundColor: COR.vermelho },

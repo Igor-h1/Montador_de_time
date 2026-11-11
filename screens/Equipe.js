@@ -14,12 +14,13 @@ import BadgeTipo from '../components/BadgeTipo';
 import GraficoElite from '../components/GraficoElite';
 import Botao from '../components/Botao';
 import { JOGOS } from '../data/jogos';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { obterSprite } from '../services/pokemonService';
 import { analisarElite } from '../services/eliteService';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function Equipe({ navigation, route }) {
+  const styles = useEstilos(criarEstilos);
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
   const { pokemonsDaEquipe, remover, MAX_EQUIPE } = useEquipe();
@@ -113,7 +114,7 @@ export default function Equipe({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   topo: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   marca: { width: 6, height: 44, borderRadius: 3, marginRight: 12 },

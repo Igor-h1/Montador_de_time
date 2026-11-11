@@ -10,12 +10,13 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import SpriteRemoto from './SpriteRemoto';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSomPokemon } from '../services/sons';
 
 const capitalizar = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
 function LinhaEvolucao({ item, onAbrir, fontesDe, bloqueado }) {
+  const styles = useEstilos(criarEstilos);
   const { pokemon, metodo } = item;
   const trancado = bloqueado ? bloqueado(pokemon) : false;
 
@@ -49,6 +50,7 @@ function LinhaEvolucao({ item, onAbrir, fontesDe, bloqueado }) {
 }
 
 export default function Evolucao({ dados, onAbrir, fontesDe, bloqueado }) {
+  const styles = useEstilos(criarEstilos);
   if (!dados) return null;
   const { de, para } = dados;
 
@@ -85,7 +87,7 @@ export default function Evolucao({ dados, onAbrir, fontesDe, bloqueado }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   secao: { backgroundColor: COR.superficie, borderRadius: 16, padding: 14, marginBottom: 16 },
   titulo: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginBottom: 10 },
   suave: { color: COR.textoSuave },
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
   linha: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COR.borda,
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 10,
-    backgroundColor: COR.superficie,
+    backgroundColor: COR.fundoSprite,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,

@@ -15,25 +15,27 @@ import BadgeTipo from './BadgeTipo';
 import Medidor from './Medidor';
 import EtiquetaTreinador from './EtiquetaTreinador';
 import SpriteRemoto from './SpriteRemoto';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 import { tocarSom } from '../services/sons';
 
 const CATEGORIAS = { elite4: 'Elite dos 4', campeao: 'Campeão', posgame: 'Pós-game' };
 
 // Texto e cor do confronto de um Pokémon do treinador contra a sua equipe
-function textoConfronto(pokemon) {
+function textoConfronto(pokemon, COR) {
   if (!pokemon.melhor) return null;
   if (pokemon.sentido === 'vantagem') {
-    return { texto: `▲ Vantagem com ${pokemon.melhor}`, cor: '#1F9D3A' };
+    return { texto: `▲ Vantagem com ${pokemon.melhor}`, cor: COR.verdeTexto };
   }
   if (pokemon.sentido === 'desvantagem') {
-    return { texto: `▼ Desvantagem (melhor: ${pokemon.melhor})`, cor: '#B3001B' };
+    return { texto: `▼ Desvantagem (melhor: ${pokemon.melhor})`, cor: COR.vermelhoTexto };
   }
   return { texto: `● Neutro (melhor: ${pokemon.melhor})`, cor: COR.textoSuave };
 }
 
 function LinhaPokemon({ pokemon, onWiki, fontesDe }) {
-  const confronto = textoConfronto(pokemon);
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
+  const confronto = textoConfronto(pokemon, COR);
 
   return (
     <View style={styles.linhaPokemon}>
@@ -71,6 +73,7 @@ function LinhaPokemon({ pokemon, onWiki, fontesDe }) {
 }
 
 export default function CartaoTreinador({ treinador, temEquipe, maisDificil, onWiki, fontesDe }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.cartao}>
       <View style={styles.cabecaTreinador}>
@@ -107,9 +110,9 @@ export default function CartaoTreinador({ treinador, temEquipe, maisDificil, onW
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   cartao: {
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COR.borda,
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
   nomeLinha: { flexDirection: 'row', alignItems: 'center' },
   nomeTreinador: { fontSize: 18, fontWeight: 'bold', color: COR.texto, flexShrink: 1 },
   etiqueta: { marginLeft: 8, marginBottom: -4 },
-  maisDificil: { color: '#B3001B', fontWeight: '600', fontSize: 12, marginBottom: 6 },
+  maisDificil: { color: COR.vermelhoTexto, fontWeight: '600', fontSize: 12, marginBottom: 6 },
   nota: { color: COR.textoSuave, fontSize: 12, fontStyle: 'italic', marginBottom: 6 },
 
   linhaPokemon: {
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 12,
-    backgroundColor: COR.superficie,
+    backgroundColor: COR.fundoSprite,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,

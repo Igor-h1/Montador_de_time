@@ -9,10 +9,12 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
 import SpriteRemoto from './SpriteRemoto';
 import { fontesSprite } from '../services/spritesGeral';
-import { COR, SOMBRA } from '../data/tema';
+import { SOMBRA } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSomPokemon } from '../services/sons';
 
 function CardPokedex({ pokemon, onPress, style }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <Pressable
       accessibilityRole="button"
@@ -42,9 +44,9 @@ function CardPokedex({ pokemon, onPress, style }) {
 
 export default React.memo(CardPokedex);
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   card: {
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COR.borda,
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 104,
     borderRadius: 12,
-    backgroundColor: COR.superficie,
+    backgroundColor: COR.fundoSprite,
     alignItems: 'center',
     justifyContent: 'center',
   },

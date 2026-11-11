@@ -7,11 +7,12 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { buscarInformacao } from '../data/informacoes';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { abrirLink } from '../services/links';
 import { tocarSom } from '../services/sons';
 
 export default function InformacaoTexto({ route }) {
+  const styles = useEstilos(criarEstilos);
   const secao = buscarInformacao(route.params.secao);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const [aviso, setAviso] = useState(null);
@@ -80,7 +81,7 @@ export default function InformacaoTexto({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   centro: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   suave: { color: COR.textoSuave, textAlign: 'center' },
@@ -91,8 +92,8 @@ const styles = StyleSheet.create({
   resumo: { fontSize: 13, color: COR.textoSuave, marginTop: 4, textAlign: 'center' },
 
   faixaErro: {
-    backgroundColor: '#F8D7DA',
-    color: '#842029',
+    backgroundColor: COR.erroFundo,
+    color: COR.erroTexto,
     padding: 10,
     borderRadius: 10,
     textAlign: 'center',
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   link: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COR.borda,

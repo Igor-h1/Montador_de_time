@@ -15,7 +15,7 @@ import Evolucao from '../components/Evolucao';
 import BotaoShiny from '../components/BotaoShiny';
 import SpriteRemoto from '../components/SpriteRemoto';
 import { TIPOS } from '../data/tipos';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { buscarPorId, urlSaibaMais } from '../services/pokemonService';
 import { fontesSprite, fontesSpriteShiny } from '../services/spritesGeral';
 import useRede from '../services/useRede';
@@ -26,6 +26,7 @@ import { useEquipe } from '../context/EquipeContext';
 import { ID_LIVRE } from '../data/livre';
 
 export default function PokedexDetalhes({ navigation, route }) {
+  const styles = useEstilos(criarEstilos);
   const { pokemonId } = route.params;
   const pokemon = buscarPorId(pokemonId);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
@@ -138,7 +139,7 @@ export default function PokedexDetalhes({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { backgroundColor: COR.fundo, flexGrow: 1 },
   centro: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   suave: { color: COR.textoSuave, textAlign: 'center' },
@@ -171,8 +172,8 @@ const styles = StyleSheet.create({
   },
   secaoTitulo: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginBottom: 10 },
   faixaErro: {
-    backgroundColor: '#F8D7DA',
-    color: '#842029',
+    backgroundColor: COR.erroFundo,
+    color: COR.erroTexto,
     padding: 10,
     borderRadius: 10,
     textAlign: 'center',

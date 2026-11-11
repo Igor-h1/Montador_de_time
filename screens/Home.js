@@ -15,7 +15,7 @@ import { JOGOS, LISTA_JOGOS } from '../data/jogos';
 import { REGIOES } from '../data/regioes';
 import { ID_LIVRE, NOME_LIVRE } from '../data/livre';
 import { CAPAS } from '../data/capas';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { useEquipe } from '../context/EquipeContext';
 import useRede from '../services/useRede';
 import { tocarSom } from '../services/sons';
@@ -33,6 +33,7 @@ const NOMES_OFFLINE = juntarNomes(
 const IDS_EM_REGIOES = new Set(REGIOES.flatMap((regiao) => regiao.jogos));
 
 export default function Home({ navigation }) {
+  const styles = useEstilos(criarEstilos);
   const { equipe, MAX_EQUIPE } = useEquipe();
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const online = useRede(); // true | false | null (ainda verificando)
@@ -117,16 +118,16 @@ export default function Home({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COR.fundo },
   aviso: {
-    backgroundColor: '#FFF4CC',
+    backgroundColor: COR.avisoFundo,
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 14,
     padding: 12,
   },
-  avisoTexto: { color: '#6B5200', fontSize: 13 },
+  avisoTexto: { color: COR.avisoTexto, fontSize: 13 },
   conteudo: { padding: 16, paddingTop: 20 },
 
   regiao: { marginBottom: 8 },

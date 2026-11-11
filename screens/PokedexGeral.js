@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CardPokedex from '../components/CardPokedex';
 import BarraFiltros from '../components/BarraFiltros';
 import Botao from '../components/Botao';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { listarTodos } from '../services/pokemonService';
 import useRede from '../services/useRede';
 import { passaFiltroTipos, MODO_QUALQUER } from '../services/filtros';
@@ -24,6 +24,7 @@ function normalizar(texto) {
 }
 
 export default function PokedexGeral({ navigation, route }) {
+  const styles = useEstilos(criarEstilos);
   const escolher = Boolean(route.params && route.params.escolher);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const online = useRede();
@@ -65,7 +66,7 @@ export default function PokedexGeral({ navigation, route }) {
 
   const renderItem = useCallback(
     ({ item }) => <CardPokedex pokemon={item} onPress={aoTocarCard} style={styles.card} />,
-    [aoTocarCard]
+    [aoTocarCard, styles]
   );
 
   return (
@@ -109,11 +110,11 @@ export default function PokedexGeral({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COR.fundo },
   aviso: {
-    backgroundColor: '#FFF4CC',
-    color: '#6B5200',
+    backgroundColor: COR.avisoFundo,
+    color: COR.avisoTexto,
     padding: 8,
     textAlign: 'center',
     fontSize: 13,

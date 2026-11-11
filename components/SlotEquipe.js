@@ -2,10 +2,12 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import SpriteRemoto from './SpriteRemoto';
 import { TIPOS } from '../data/tipos';
-import { COR, SOMBRA } from '../data/tema';
+import { SOMBRA } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSom, tocarSomPokemon } from '../services/sons';
 
 export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style }) {
+  const styles = useEstilos(criarEstilos);
   if (!pokemon) {
     return (
       <Pressable
@@ -64,7 +66,7 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   slot: {
     aspectRatio: 1,
     borderRadius: 18,
@@ -76,10 +78,10 @@ const styles = StyleSheet.create({
     backgroundColor: COR.superficie,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#D1D5DB',
+    borderColor: COR.contorno,
   },
   cheio: {
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderWidth: 1,
     borderColor: COR.borda,
     ...SOMBRA,
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   removerTexto: { color: COR.branco, fontSize: 11, fontWeight: 'bold' },
-  imagem: { width: 54, height: 54 },
+  imagem: { width: 54, height: 54, borderRadius: 10, backgroundColor: COR.placaSprite },
   interrogacao: { fontSize: 28, color: '#B0B5BD', fontWeight: 'bold' },
   nome: { fontSize: 12, fontWeight: '700', color: COR.texto, marginTop: 2 },
   tipos: { flexDirection: 'row', marginTop: 4 },

@@ -1,16 +1,16 @@
 // App.js
-// Navegação (Stack) + Provider da equipe envolvendo o app inteiro.
+// Navegação (Stack) + Providers do tema e da equipe envolvendo o app inteiro.
 // Fluxo: Menu -> Montar time (escolher o jogo) -> Equipe -> Pokédex -> Detalhes
 // O Menu também abre Ver Pokédex, Informações e Configurações.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { EquipeProvider } from './context/EquipeContext';
 import { JOGOS } from './data/jogos';
-import { COR } from './data/tema';
+import { TemaProvider, useTema } from './services/tema';
 import { buscarPorId } from './services/pokemonService';
 import Menu from './screens/Menu';
 import Home from './screens/Home';
@@ -34,104 +34,130 @@ import { tocarSomVoltar } from './services/sons';
 
 const Stack = createNativeStackNavigator();
 
+// Navegação. Fica dentro do TemaProvider para as cores do cabeçalho e do fundo trocarem ao vivo.
+function Navegacao() {
+  const { COR, escuro } = useTema();
+  const base = escuro ? DarkTheme : DefaultTheme;
+  const temaNavegacao = useMemo(
+    () => ({
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: COR.vermelho,
+        background: COR.fundo,
+        card: COR.cabecalho,
+        text: COR.branco,
+        border: COR.borda,
+      },
+    }),
+    [base, COR]
+  );
+
+  return (
+    <NavigationContainer theme={temaNavegacao}>
+      <StatusBar style="light" />
+      <Stack.Navigator
+        initialRouteName="Menu"
+        screenListeners={{
+          // Voltar de uma tela (botão do header, gesto ou botão do Android): som de cancelar
+          transitionStart: (evento) => {
+            if (evento.data && evento.data.closing) tocarSomVoltar();
+          },
+        }}
+        screenOptions={{
+          headerStyle: { backgroundColor: COR.cabecalho },
+          headerTintColor: COR.branco,
+          headerTitleStyle: { fontWeight: '700' },
+          contentStyle: { backgroundColor: COR.fundo },
+        }}
+      >
+        {/* O Menu é o aparelho em forma de Pokédex: não usa o header */}
+        <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }} />
+        <Stack.Screen name="MontarTime" component={Home} options={{ title: 'Escolher jogo' }} />
+        <Stack.Screen
+          name="Equipe"
+          component={Equipe}
+          options={({ route }) => ({ title: `Equipe ${JOGOS[route.params.jogo].nome}` })}
+        />
+        <Stack.Screen
+          name="Pokedex"
+          component={Pokedex}
+          options={{ title: 'Escolher Pokémon' }}
+        />
+        <Stack.Screen
+          name="Detalhes"
+          component={Detalhes}
+          options={({ route }) => {
+            const pokemon = buscarPorId(route.params.pokemonId);
+            return { title: pokemon ? pokemon.nome : 'Detalhes' };
+          }}
+        />
+        <Stack.Screen
+          name="PokedexGeral"
+          component={PokedexGeral}
+          options={({ route }) => ({
+            title: route.params && route.params.escolher ? 'Escolher Pokémon' : 'Pokédex',
+          })}
+        />
+        <Stack.Screen
+          name="PokedexDetalhes"
+          component={PokedexDetalhes}
+          options={({ route }) => {
+            const pokemon = buscarPorId(route.params.pokemonId);
+            return { title: pokemon ? pokemon.nome : 'Pokémon' };
+          }}
+        />
+        <Stack.Screen name="EquipeLivre" component={EquipeLivre} options={{ title: NOME_LIVRE }} />
+        <Stack.Screen
+          name="EliteLivre"
+          component={EliteLivre}
+          options={{ title: 'Campeões das regiões' }}
+        />
+        <Stack.Screen
+          name="EliteLivreCompleta"
+          component={EliteLivreCompleta}
+          options={{ title: 'Elite dos 4 e pós-game' }}
+        />
+        <Stack.Screen name="Informacoes" component={Informacoes} options={{ title: 'Informações' }} />
+        <Stack.Screen
+          name="Configuracoes"
+          component={Configuracoes}
+          options={{ title: 'Configurações' }}
+        />
+        <Stack.Screen
+          name="InformacaoTexto"
+          component={InformacaoTexto}
+          options={({ route }) => {
+            const secao = buscarInformacao(route.params.secao);
+            return { title: secao ? secao.titulo : 'Informações' };
+          }}
+        />
+        <Stack.Screen
+          name="Tipos"
+          component={Tipos}
+          options={{ title: 'Tipos da equipe' }}
+        />
+        <Stack.Screen
+          name="Elite"
+          component={Elite}
+          options={({ route }) => {
+            const elite = obterElite(route.params.jogo);
+            return { title: elite ? `Elite dos 4 · ${elite.regiao}` : 'Elite dos 4' };
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
-      <EquipeProvider>
-        <NavigationContainer>
-          <StatusBar style="light" />
-          <Stack.Navigator
-            initialRouteName="Menu"
-            screenListeners={{
-              // Voltar de uma tela (botão do header, gesto ou botão do Android): som de cancelar
-              transitionStart: (evento) => {
-                if (evento.data && evento.data.closing) tocarSomVoltar();
-              },
-            }}
-            screenOptions={{
-              headerStyle: { backgroundColor: COR.vermelho },
-              headerTintColor: COR.branco,
-              headerTitleStyle: { fontWeight: '700' },
-              contentStyle: { backgroundColor: COR.fundo },
-            }}
-          >
-            {/* O Menu é o aparelho em forma de Pokédex: não usa o header */}
-            <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }} />
-            <Stack.Screen name="MontarTime" component={Home} options={{ title: 'Escolher jogo' }} />
-            <Stack.Screen
-              name="Equipe"
-              component={Equipe}
-              options={({ route }) => ({ title: `Equipe ${JOGOS[route.params.jogo].nome}` })}
-            />
-            <Stack.Screen
-              name="Pokedex"
-              component={Pokedex}
-              options={{ title: 'Escolher Pokémon' }}
-            />
-            <Stack.Screen
-              name="Detalhes"
-              component={Detalhes}
-              options={({ route }) => {
-                const pokemon = buscarPorId(route.params.pokemonId);
-                return { title: pokemon ? pokemon.nome : 'Detalhes' };
-              }}
-            />
-            <Stack.Screen
-              name="PokedexGeral"
-              component={PokedexGeral}
-              options={({ route }) => ({
-                title: route.params && route.params.escolher ? 'Escolher Pokémon' : 'Pokédex',
-              })}
-            />
-            <Stack.Screen
-              name="PokedexDetalhes"
-              component={PokedexDetalhes}
-              options={({ route }) => {
-                const pokemon = buscarPorId(route.params.pokemonId);
-                return { title: pokemon ? pokemon.nome : 'Pokémon' };
-              }}
-            />
-            <Stack.Screen name="EquipeLivre" component={EquipeLivre} options={{ title: NOME_LIVRE }} />
-            <Stack.Screen
-              name="EliteLivre"
-              component={EliteLivre}
-              options={{ title: 'Campeões das regiões' }}
-            />
-            <Stack.Screen
-              name="EliteLivreCompleta"
-              component={EliteLivreCompleta}
-              options={{ title: 'Elite dos 4 e pós-game' }}
-            />
-            <Stack.Screen name="Informacoes" component={Informacoes} options={{ title: 'Informações' }} />
-            <Stack.Screen
-              name="Configuracoes"
-              component={Configuracoes}
-              options={{ title: 'Configurações' }}
-            />
-            <Stack.Screen
-              name="InformacaoTexto"
-              component={InformacaoTexto}
-              options={({ route }) => {
-                const secao = buscarInformacao(route.params.secao);
-                return { title: secao ? secao.titulo : 'Informações' };
-              }}
-            />
-            <Stack.Screen
-              name="Tipos"
-              component={Tipos}
-              options={{ title: 'Tipos da equipe' }}
-            />
-            <Stack.Screen
-              name="Elite"
-              component={Elite}
-              options={({ route }) => {
-                const elite = obterElite(route.params.jogo);
-                return { title: elite ? `Elite dos 4 · ${elite.regiao}` : 'Elite dos 4' };
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </EquipeProvider>
+      <TemaProvider>
+        <EquipeProvider>
+          <Navegacao />
+        </EquipeProvider>
+      </TemaProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSom } from '../services/sons';
 
 export default function Botao({
@@ -11,6 +11,7 @@ export default function Botao({
   // som ao tocar: 'confirmar' (padrão), 'cancelar' (padrão do botão perigo) ou null (sem som)
   som = variante === 'perigo' ? 'cancelar' : 'confirmar',
 }) {
+  const styles = useEstilos(criarEstilos);
   const estiloVariante = styles[variante] || styles.primaria;
 
   function aoPressionar(evento) {
@@ -37,7 +38,7 @@ export default function Botao({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   botao: {
     alignItems: 'center',
     justifyContent: 'center',

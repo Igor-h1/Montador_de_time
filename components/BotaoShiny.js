@@ -5,10 +5,11 @@
 
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSom } from '../services/sons';
 
 export default function BotaoShiny({ ativo, desabilitado, onPress }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.caixa}>
       <Pressable
@@ -33,7 +34,7 @@ export default function BotaoShiny({ ativo, desabilitado, onPress }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   caixa: { alignItems: 'center', marginTop: 12 },
   botao: {
     paddingHorizontal: 18,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1.5,
     borderColor: COR.borda,
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
   },
   ativo: { backgroundColor: COR.amarelo, borderColor: '#C9A000' },
   desabilitado: { opacity: 0.45 },

@@ -8,13 +8,14 @@ import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CartaoTreinador from '../components/CartaoTreinador';
 import SeloNivel from '../components/SeloNivel';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { analisarElite } from '../services/eliteService';
 import { buscarPorNome, obterSprite } from '../services/pokemonService';
 import { abrirLink, urlWiki } from '../services/links';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function Elite({ route }) {
+  const styles = useEstilos(criarEstilos);
   const jogoId = route.params.jogo;
   const insets = useSafeAreaInsets();
   const { pokemonsDaEquipe } = useEquipe();
@@ -110,7 +111,7 @@ export default function Elite({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { padding: 16, backgroundColor: COR.fundo, flexGrow: 1 },
   centro: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   suave: { color: COR.textoSuave, textAlign: 'center' },
@@ -127,8 +128,8 @@ const styles = StyleSheet.create({
   resumoTexto: { color: COR.texto, marginBottom: 8 },
   aviso: { fontSize: 11, color: COR.textoSuave },
   faixaErro: {
-    backgroundColor: '#F8D7DA',
-    color: '#842029',
+    backgroundColor: COR.erroFundo,
+    color: COR.erroTexto,
     padding: 10,
     borderRadius: 10,
     textAlign: 'center',

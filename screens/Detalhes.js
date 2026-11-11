@@ -18,7 +18,7 @@ import BotaoShiny from '../components/BotaoShiny';
 import SpriteRemoto from '../components/SpriteRemoto';
 import { JOGOS } from '../data/jogos';
 import { TIPOS } from '../data/tipos';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import {
   buscarPorId,
   obterSprite,
@@ -36,6 +36,7 @@ import { useEquipe } from '../context/EquipeContext';
 const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
 
 export default function Detalhes({ navigation, route }) {
+  const styles = useEstilos(criarEstilos);
   const { pokemonId, jogo: jogoId } = route.params;
   const jogo = JOGOS[jogoId];
   const pokemon = buscarPorId(pokemonId);
@@ -187,7 +188,7 @@ export default function Detalhes({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { backgroundColor: COR.fundo, flexGrow: 1 },
   centro: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   topo: {
@@ -221,6 +222,6 @@ const styles = StyleSheet.create({
   },
   secaoTitulo: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginBottom: 10 },
   faixa: { padding: 10, borderRadius: 10, textAlign: 'center', marginBottom: 12, overflow: 'hidden' },
-  ok: { backgroundColor: '#D1E7DD', color: '#0F5132' },
-  erro: { backgroundColor: '#F8D7DA', color: '#842029' },
+  ok: { backgroundColor: COR.okFundo, color: COR.okTexto },
+  erro: { backgroundColor: COR.erroFundo, color: COR.erroTexto },
 });

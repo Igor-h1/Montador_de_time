@@ -7,7 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { STATUS } from '../data/stats';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 
 const MAX_BARRA = 200; // valor que enche a barra (acima disso, a barra fica cheia)
 
@@ -20,6 +20,7 @@ function corDoValor(valor) {
 }
 
 export default function StatusBase({ stats }) {
+  const styles = useEstilos(criarEstilos);
   if (!Array.isArray(stats) || stats.length !== STATUS.length) return null;
 
   const total = stats.reduce((soma, valor) => soma + valor, 0);
@@ -60,7 +61,7 @@ export default function StatusBase({ stats }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   secao: { backgroundColor: COR.superficie, borderRadius: 16, padding: 14, marginBottom: 16 },
   titulo: { fontSize: 16, fontWeight: 'bold', color: COR.texto, marginBottom: 10 },
   linha: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },

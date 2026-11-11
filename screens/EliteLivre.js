@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CartaoTreinador from '../components/CartaoTreinador';
 import SeloNivel from '../components/SeloNivel';
 import Botao from '../components/Botao';
-import { COR } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { ID_LIVRE } from '../data/livre';
 import { analisarEliteLivre } from '../services/eliteService';
 import { buscarPorNome } from '../services/pokemonService';
@@ -19,6 +19,7 @@ import { abrirLink, urlWiki } from '../services/links';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function EliteLivre({ navigation }) {
+  const styles = useEstilos(criarEstilos);
   const insets = useSafeAreaInsets();
   const { pokemonsDaEquipe } = useEquipe();
   const [aviso, setAviso] = useState(null);
@@ -114,7 +115,7 @@ export default function EliteLivre({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   lista: { backgroundColor: COR.fundo },
   conteudo: { padding: 16 },
 
@@ -130,8 +131,8 @@ const styles = StyleSheet.create({
   resumoTexto: { color: COR.texto, marginBottom: 8 },
   aviso: { fontSize: 11, color: COR.textoSuave },
   faixaErro: {
-    backgroundColor: '#F8D7DA',
-    color: '#842029',
+    backgroundColor: COR.erroFundo,
+    color: COR.erroTexto,
     padding: 10,
     borderRadius: 10,
     textAlign: 'center',

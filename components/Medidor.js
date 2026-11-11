@@ -8,11 +8,13 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 
 const TOTAL = 5;
 
 export default function Medidor({ quadrados, sentido, tamanho = 20 }) {
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
   const cor =
     sentido === 'vantagem' ? COR.verde : sentido === 'desvantagem' ? COR.vermelho : null;
 
@@ -40,12 +42,12 @@ export default function Medidor({ quadrados, sentido, tamanho = 20 }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   linha: { flexDirection: 'row' },
   quadrado: {
     borderRadius: 5,
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
+    borderColor: COR.contorno,
     marginLeft: 4,
   },
 });

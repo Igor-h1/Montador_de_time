@@ -14,7 +14,7 @@ import Card from '../components/Card';
 import Botao from '../components/Botao';
 import BarraFiltros from '../components/BarraFiltros';
 import { JOGOS } from '../data/jogos';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 import { listarPorJogo, obterSprite } from '../services/pokemonService';
 import { carregarPokedexOnline, dexOnlineCarregada } from '../services/pokedexOnline';
 import useRede from '../services/useRede';
@@ -28,6 +28,8 @@ function normalizar(texto) {
 }
 
 export default function Pokedex({ navigation, route }) {
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
   const online = useRede();
@@ -117,7 +119,7 @@ export default function Pokedex({ navigation, route }) {
         style={styles.card}
       />
     ),
-    [jogoId, aoTocarCard]
+    [jogoId, aoTocarCard, styles]
   );
 
   // Jogo online ainda sem a lista: mostra carregando ou o erro
@@ -176,7 +178,7 @@ export default function Pokedex({ navigation, route }) {
           <Switch
             value={apenasDisponiveis}
             onValueChange={setApenasDisponiveis}
-            trackColor={{ false: '#D1D5DB', true: COR.vermelho }}
+            trackColor={{ false: COR.contorno, true: COR.vermelho }}
             thumbColor={COR.branco}
           />
         </View>
@@ -207,7 +209,7 @@ export default function Pokedex({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COR.fundo },
   estado: {
     flex: 1,
@@ -221,8 +223,8 @@ const styles = StyleSheet.create({
   acoes: { alignSelf: 'stretch' },
   estadoDica: { color: COR.textoSuave, fontSize: 12, textAlign: 'center', marginTop: 8 },
   aviso: {
-    backgroundColor: '#FFF4CC',
-    color: '#6B5200',
+    backgroundColor: COR.avisoFundo,
+    color: COR.avisoTexto,
     padding: 8,
     textAlign: 'center',
     fontSize: 13,

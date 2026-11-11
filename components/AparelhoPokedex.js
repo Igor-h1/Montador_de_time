@@ -16,12 +16,13 @@
 
 import React from 'react';
 import { View, Text, Pressable, Platform, StyleSheet } from 'react-native';
-import { COR, APARELHO } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 
 // Fonte monoespaçada do sistema para a tela verde (depois dá para trocar pela fonte pixelada)
 const FONTE_LCD = Platform.select({ ios: 'Courier', android: 'monospace', default: 'monospace' });
 
 function Lente() {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.lente}>
       <View style={styles.lenteInterna}>
@@ -32,6 +33,7 @@ function Lente() {
 }
 
 function Pokebola() {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.pokebola}>
       <View style={styles.pokebolaCima} />
@@ -43,6 +45,7 @@ function Pokebola() {
 }
 
 function Direcional({ onCima, onBaixo, onEsquerda, onDireita }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.direcional}>
       <View style={styles.cruzVertical} />
@@ -89,6 +92,8 @@ function Direcional({ onCima, onBaixo, onEsquerda, onDireita }) {
 }
 
 function BotaoRedondo({ tipo, onPress }) {
+  const { APARELHO } = useTema();
+  const styles = useEstilos(criarEstilos);
   const confirmar = tipo === 'confirmar';
   return (
     <Pressable
@@ -118,6 +123,7 @@ export default function AparelhoPokedex({
   onConfirmar,
   onCancelar,
 }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <View style={styles.aparelho}>
       <View style={styles.topo}>
@@ -161,7 +167,7 @@ export default function AparelhoPokedex({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR, APARELHO) => StyleSheet.create({
   // Sem cantos arredondados, borda nem sombra: o aparelho vai até as bordas da tela
   aparelho: {
     flex: 1,
@@ -251,7 +257,7 @@ const styles = StyleSheet.create({
   tela: {
     flex: 1,
     marginHorizontal: 14,
-    backgroundColor: COR.branco,
+    backgroundColor: COR.fundo,
     borderWidth: 3,
     borderColor: APARELHO.telaBorda,
     borderRadius: 6,

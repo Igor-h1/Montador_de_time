@@ -12,9 +12,11 @@ import Botao from './Botao';
 import Medidor from './Medidor';
 import SeloNivel from './SeloNivel';
 import EtiquetaTreinador from './EtiquetaTreinador';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 
 export default function GraficoElite({ analise, onSaberMais, titulo }) {
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
   if (!analise) return null;
 
   return (
@@ -74,7 +76,7 @@ export default function GraficoElite({ analise, onSaberMais, titulo }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   secao: {
     backgroundColor: COR.superficie,
     borderRadius: 16,
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 3,
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
+    borderColor: COR.contorno,
     marginRight: 4,
   },
   legendaTexto: { fontSize: 11, color: COR.textoSuave, marginRight: 12 },

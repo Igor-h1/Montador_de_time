@@ -6,8 +6,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
+import { useEstilos } from '../services/tema';
 
 export default function EtiquetaTreinador({ treinador }) {
+  const styles = useEstilos(criarEstilos);
   if (treinador.tipo) {
     return (
       <View style={styles.alinhar}>
@@ -24,14 +26,14 @@ export default function EtiquetaTreinador({ treinador }) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   alinhar: { alignSelf: 'flex-start' },
   pilula: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: COR.borda,
     borderRadius: 12,
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginBottom: 4,
   },
-  texto: { fontSize: 10, fontWeight: '700', color: '#4B5563' },
+  texto: { fontSize: 10, fontWeight: '700', color: COR.textoSuave },
 });

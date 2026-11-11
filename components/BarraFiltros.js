@@ -12,11 +12,13 @@
 import React from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { TIPOS, LISTA_TIPOS } from '../data/tipos';
-import { COR } from '../data/tema';
+import { useTema, useEstilos } from '../services/tema';
 import { alternarTipo, MODO_QUALQUER, MODO_TODOS } from '../services/filtros';
 
 // Etiqueta do filtro de tipo: ativa fica preenchida com a cor do tipo
 function Chip({ texto, ativo, cor, onPress }) {
+  const { COR } = useTema();
+  const styles = useEstilos(criarEstilos);
   const corAtiva = cor || COR.vermelho;
   return (
     <Pressable
@@ -32,6 +34,7 @@ function Chip({ texto, ativo, cor, onPress }) {
 
 // Um dos dois lados do seletor de modo
 function Opcao({ texto, ativa, onPress }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <Pressable
       accessibilityRole="button"
@@ -54,6 +57,7 @@ export default function BarraFiltros({
   contagem,
   children,
 }) {
+  const styles = useEstilos(criarEstilos);
   const varios = tiposFiltro.length >= 2;
 
   return (
@@ -129,9 +133,9 @@ export default function BarraFiltros({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   filtros: {
-    backgroundColor: COR.branco,
+    backgroundColor: COR.fundo,
     paddingTop: 12,
     paddingBottom: 6,
     borderBottomWidth: 1,
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: COR.borda,
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     marginRight: 8,
   },
   chipTexto: { fontSize: 13, color: COR.texto, fontWeight: '600' },
@@ -175,7 +179,7 @@ const styles = StyleSheet.create({
   opcaoAtiva: { backgroundColor: COR.vermelho },
   opcaoTexto: { fontSize: 13, fontWeight: '600', color: COR.texto },
   opcaoTextoAtivo: { color: COR.branco },
-  modoAviso: { fontSize: 11, color: '#B3001B', marginTop: 6 },
+  modoAviso: { fontSize: 11, color: COR.vermelhoTexto, marginTop: 6 },
 
   resumo: {
     flexDirection: 'row',
