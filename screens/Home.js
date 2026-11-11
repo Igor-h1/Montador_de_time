@@ -18,6 +18,7 @@ import { CAPAS } from '../data/capas';
 import { COR } from '../data/tema';
 import { useEquipe } from '../context/EquipeContext';
 import useRede from '../services/useRede';
+import { tocarSom } from '../services/sons';
 
 // "A, B e C"
 function juntarNomes(nomes) {
@@ -93,7 +94,10 @@ export default function Home({ navigation }) {
         {online === true ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => navigation.navigate('EquipeLivre')}
+            onPress={() => {
+              tocarSom('confirmar');
+              navigation.navigate('EquipeLivre');
+            }}
             style={({ pressed }) => [styles.livre, pressed && styles.pressionado]}
           >
             <Text style={styles.livreIcone}>🌍</Text>

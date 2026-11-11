@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import BadgeTipo from './BadgeTipo';
 import { COR, SOMBRA } from '../data/tema';
+import { tocarSomPokemon } from '../services/sons';
 
 // Número da Pokédex do jogo (ex.: #001); quem não está nela mostra o número nacional
 function rotuloNumero(pokemon) {
@@ -19,7 +20,10 @@ function Card({ pokemon, sprite, disponivel, onPress, style }) {
       accessibilityRole="button"
       accessibilityState={{ disabled: !disponivel }}
       disabled={!disponivel}
-      onPress={() => onPress(pokemon)}
+      onPress={() => {
+        tocarSomPokemon(pokemon);
+        onPress(pokemon);
+      }}
       style={({ pressed }) => [
         styles.card,
         !disponivel && styles.indisponivel,

@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import SpriteRemoto from './SpriteRemoto';
 import { TIPOS } from '../data/tipos';
 import { COR, SOMBRA } from '../data/tema';
+import { tocarSom, tocarSomPokemon } from '../services/sons';
 
 export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style }) {
   if (!pokemon) {
@@ -28,7 +29,10 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => onPress && onPress(pokemon)}
+      onPress={() => {
+        tocarSomPokemon(pokemon);
+        if (onPress) onPress(pokemon);
+      }}
       style={({ pressed }) => [styles.slot, styles.cheio, pressed && styles.pressionado, style]}
     >
       <Pressable
@@ -36,7 +40,8 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
         accessibilityLabel={`Remover ${pokemon.nome} da equipe`}
         onPress={(event) => {
           event.stopPropagation();
-          onRemover && onRemover(pokemon);
+          tocarSom('cancelar');
+          if (onRemover) onRemover(pokemon);
         }}
         hitSlop={8}
         style={styles.remover}

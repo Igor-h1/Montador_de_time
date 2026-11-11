@@ -39,6 +39,7 @@ export default function Configuracoes() {
 
   function aoMudarOffline(valor) {
     definirConfiguracao('modoOffline', valor);
+    tocarSom(valor ? 'confirmar' : 'cancelar');
   }
 
   return (

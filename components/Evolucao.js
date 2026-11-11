@@ -11,6 +11,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import SpriteRemoto from './SpriteRemoto';
 import { COR } from '../data/tema';
+import { tocarSomPokemon } from '../services/sons';
 
 const capitalizar = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
@@ -22,7 +23,10 @@ function LinhaEvolucao({ item, onAbrir, fontesDe, bloqueado }) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`Abrir ${pokemon.nome}`}
-      onPress={() => onAbrir(pokemon)}
+      onPress={() => {
+        tocarSomPokemon(pokemon);
+        onAbrir(pokemon);
+      }}
       style={({ pressed }) => [styles.linha, pressed && styles.pressionado]}
     >
       <View style={styles.spriteBox}>

@@ -1,20 +1,28 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import { COR } from '../data/tema';
+import { tocarSom } from '../services/sons';
 
 export default function Botao({
   texto,
   onPress,
   variante = 'primaria',
   desabilitado = false,
+  // som ao tocar: 'confirmar' (padrão), 'cancelar' (padrão do botão perigo) ou null (sem som)
+  som = variante === 'perigo' ? 'cancelar' : 'confirmar',
 }) {
   const estiloVariante = styles[variante] || styles.primaria;
+
+  function aoPressionar(evento) {
+    if (som) tocarSom(som);
+    if (onPress) onPress(evento);
+  }
 
   return (
     <Pressable
       accessibilityRole="button"
       disabled={desabilitado}
-      onPress={onPress}
+      onPress={aoPressionar}
       style={({ pressed }) => [
         styles.botao,
         estiloVariante,

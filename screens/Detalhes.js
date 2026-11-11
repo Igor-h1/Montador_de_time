@@ -30,6 +30,7 @@ import { fontesShiny } from '../services/shiny';
 import useRede from '../services/useRede';
 import { obterEvolucao, temDadosEvolucao } from '../services/evolucoes';
 import { abrirLink } from '../services/links';
+import { nomeSomTipo } from '../services/sons';
 import { useEquipe } from '../context/EquipeContext';
 
 const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
@@ -166,7 +167,12 @@ export default function Detalhes({ navigation, route }) {
         {jaNoTime ? (
           <Botao texto="Remover do time" variante="perigo" onPress={aoRemover} />
         ) : (
-          <Botao texto="Adicionar ao time" desabilitado={!disponivel} onPress={aoAdicionar} />
+          <Botao
+            texto="Adicionar ao time"
+            desabilitado={!disponivel}
+            som={nomeSomTipo(pokemon)}
+            onPress={aoAdicionar}
+          />
         )}
 
         {aviso ? (

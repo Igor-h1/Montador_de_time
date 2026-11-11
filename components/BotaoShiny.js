@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { COR } from '../data/tema';
+import { tocarSom } from '../services/sons';
 
 export default function BotaoShiny({ ativo, desabilitado, onPress }) {
   return (
@@ -14,7 +15,10 @@ export default function BotaoShiny({ ativo, desabilitado, onPress }) {
         accessibilityRole="button"
         accessibilityState={{ selected: ativo, disabled: desabilitado }}
         disabled={desabilitado}
-        onPress={onPress}
+        onPress={() => {
+          tocarSom(ativo ? 'shinyDesativar' : 'shinyAtivar');
+          if (onPress) onPress();
+        }}
         style={({ pressed }) => [
           styles.botao,
           ativo && styles.ativo,

@@ -10,12 +10,16 @@ import BadgeTipo from './BadgeTipo';
 import SpriteRemoto from './SpriteRemoto';
 import { fontesSprite } from '../services/spritesGeral';
 import { COR, SOMBRA } from '../data/tema';
+import { tocarSomPokemon } from '../services/sons';
 
 function CardPokedex({ pokemon, onPress, style }) {
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => onPress(pokemon)}
+      onPress={() => {
+        tocarSomPokemon(pokemon);
+        onPress(pokemon);
+      }}
       style={({ pressed }) => [styles.card, pressed && styles.pressionado, style]}
     >
       <View style={styles.imagemBox}>

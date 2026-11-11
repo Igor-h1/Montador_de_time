@@ -21,6 +21,7 @@ import { fontesSprite, fontesSpriteShiny } from '../services/spritesGeral';
 import useRede from '../services/useRede';
 import { obterEvolucao, temDadosEvolucao } from '../services/evolucoes';
 import { abrirLink } from '../services/links';
+import { nomeSomTipo } from '../services/sons';
 import { useEquipe } from '../context/EquipeContext';
 import { ID_LIVRE } from '../data/livre';
 
@@ -125,7 +126,7 @@ export default function PokedexDetalhes({ navigation, route }) {
           jaNoTime ? (
             <Botao texto="Remover do time" variante="perigo" onPress={aoRemover} />
           ) : (
-            <Botao texto="Adicionar ao time" onPress={aoAdicionar} />
+            <Botao texto="Adicionar ao time" som={nomeSomTipo(pokemon)} onPress={aoAdicionar} />
           )
         ) : null}
 

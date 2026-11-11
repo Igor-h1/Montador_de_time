@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { COR, SOMBRA } from '../data/tema';
+import { tocarSom } from '../services/sons';
 
 export default function CapaJogo({ jogo, capa, quantidade, max, onPress, style }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${jogo.nome}, ${quantidade} de ${max} Pokémon na equipe`}
-      onPress={onPress}
+      onPress={() => {
+        tocarSom('confirmar');
+        if (onPress) onPress();
+      }}
       style={({ pressed }) => [styles.cartao, pressed && styles.pressionado, style]}
     >
       {capa ? (

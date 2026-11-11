@@ -16,6 +16,7 @@ import Medidor from './Medidor';
 import EtiquetaTreinador from './EtiquetaTreinador';
 import SpriteRemoto from './SpriteRemoto';
 import { COR } from '../data/tema';
+import { tocarSom } from '../services/sons';
 
 const CATEGORIAS = { elite4: 'Elite dos 4', campeao: 'Campeão', posgame: 'Pós-game' };
 
@@ -57,7 +58,10 @@ function LinhaPokemon({ pokemon, onWiki, fontesDe }) {
       <Pressable
         accessibilityRole="link"
         accessibilityLabel={`Saiba mais sobre ${pokemon.nome}`}
-        onPress={() => onWiki(pokemon.nome)}
+        onPress={() => {
+          tocarSom('confirmar');
+          onWiki(pokemon.nome);
+        }}
         style={({ pressed }) => [styles.link, pressed && styles.pressionado]}
       >
         <Text style={styles.linkTexto}>Saiba mais</Text>

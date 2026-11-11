@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { buscarInformacao } from '../data/informacoes';
 import { COR } from '../data/tema';
 import { abrirLink } from '../services/links';
+import { tocarSom } from '../services/sons';
 
 export default function InformacaoTexto({ route }) {
   const secao = buscarInformacao(route.params.secao);
@@ -60,7 +61,10 @@ export default function InformacaoTexto({ route }) {
               key={`l${j}`}
               accessibilityRole="link"
               accessibilityLabel={`Abrir ${link.rotulo}`}
-              onPress={() => aoAbrirLink(link.url)}
+              onPress={() => {
+                tocarSom('confirmar');
+                aoAbrirLink(link.url);
+              }}
               style={({ pressed }) => [styles.link, pressed && styles.pressionado]}
             >
               <View style={styles.linkTextos}>

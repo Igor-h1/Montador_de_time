@@ -7,6 +7,7 @@ import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { INFORMACOES } from '../data/informacoes';
 import { COR, SOMBRA } from '../data/tema';
+import { tocarSom } from '../services/sons';
 
 export default function Informacoes({ navigation }) {
   const insets = useSafeAreaInsets(); // margem para os botões do Android
@@ -19,7 +20,10 @@ export default function Informacoes({ navigation }) {
         <Pressable
           key={secao.id}
           accessibilityRole="button"
-          onPress={() => navigation.navigate('InformacaoTexto', { secao: secao.id })}
+          onPress={() => {
+            tocarSom('confirmar');
+            navigation.navigate('InformacaoTexto', { secao: secao.id });
+          }}
           style={({ pressed }) => [styles.cartao, pressed && styles.pressionado]}
         >
           <Text style={styles.icone}>{secao.icone}</Text>

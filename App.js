@@ -30,6 +30,7 @@ import Configuracoes from './screens/Configuracoes';
 import { buscarInformacao } from './data/informacoes';
 import { NOME_LIVRE } from './data/livre';
 import { obterElite } from './services/eliteService';
+import { tocarSomVoltar } from './services/sons';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,12 @@ export default function App() {
           <StatusBar style="light" />
           <Stack.Navigator
             initialRouteName="Menu"
+            screenListeners={{
+              // Voltar de uma tela (botão do header, gesto ou botão do Android): som de cancelar
+              transitionStart: (evento) => {
+                if (evento.data && evento.data.closing) tocarSomVoltar();
+              },
+            }}
             screenOptions={{
               headerStyle: { backgroundColor: COR.vermelho },
               headerTintColor: COR.branco,

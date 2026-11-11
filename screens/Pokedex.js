@@ -19,6 +19,7 @@ import { listarPorJogo, obterSprite } from '../services/pokemonService';
 import { carregarPokedexOnline, dexOnlineCarregada } from '../services/pokedexOnline';
 import useRede from '../services/useRede';
 import { semInternet } from '../services/rede';
+import { useConfiguracoes, definirConfiguracao } from '../services/configuracoes';
 import { passaFiltroTipos, MODO_QUALQUER } from '../services/filtros';
 
 // Minúsculas e sem acentos, para a busca não depender de maiúsculas
@@ -30,6 +31,7 @@ export default function Pokedex({ navigation, route }) {
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
   const online = useRede();
+  const { modoOffline } = useConfiguracoes();
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   const [busca, setBusca] = useState('');
@@ -51,7 +53,7 @@ export default function Pokedex({ navigation, route }) {
       await carregarPokedexOnline(jogoId);
       setDexPronta(true);
     } catch (e) {
-      setErro('Não foi possível carregar a lista deste jogo. Tente novamente.');
+      setErro('Não foi possível carregar a lista deste jogo. A PokéAPI pode estar fora do ar.');
     }
   }, [jogoId]);
 
@@ -59,6 +61,13 @@ export default function Pokedex({ navigation, route }) {
   useEffect(() => {
     if (!dexPronta) carregarDex();
   }, [dexPronta, carregarDex]);
+
+  // Saída quando a API não responde: liga o modo offline e volta ao Menu, onde só
+  // os jogos que funcionam sem internet continuam disponíveis
+  function ativarModoOffline() {
+    definirConfiguracao('modoOffline', true);
+    navigation.popToTop();
+  }
 
   // Os Pokémon do jogo (cada um com o campo "disponivel")
   const todos = useMemo(() => listarPorJogo(jogoId), [jogoId, dexPronta]);
@@ -118,7 +127,22 @@ export default function Pokedex({ navigation, route }) {
         {erro ? (
           <>
             <Text style={styles.estadoTexto}>{erro}</Text>
-            <Botao texto="Tentar de novo" onPress={carregarDex} />
+            <Text style={styles.estadoPergunta}>O que você quer fazer?</Text>
+            <View style={styles.acoes}>
+              <Botao texto="Tentar novamente" onPress={carregarDex} />
+              {!modoOffline ? (
+                <Botao
+                  texto="Ativar modo offline"
+                  variante="secundaria"
+                  onPress={ativarModoOffline}
+                />
+              ) : null}
+            </View>
+            {!modoOffline ? (
+              <Text style={styles.estadoDica}>
+                O modo offline deixa só FireRed, LeafGreen, Ruby, Sapphire e Emerald.
+              </Text>
+            ) : null}
           </>
         ) : (
           <>
@@ -193,6 +217,9 @@ const styles = StyleSheet.create({
     backgroundColor: COR.fundo,
   },
   estadoTexto: { color: COR.textoSuave, fontSize: 16, textAlign: 'center', marginVertical: 16 },
+  estadoPergunta: { color: COR.texto, fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  acoes: { alignSelf: 'stretch' },
+  estadoDica: { color: COR.textoSuave, fontSize: 12, textAlign: 'center', marginTop: 8 },
   aviso: {
     backgroundColor: '#FFF4CC',
     color: '#6B5200',
