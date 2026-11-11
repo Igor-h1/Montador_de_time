@@ -1,6 +1,7 @@
 // App.js
 // Navegação (Stack) + Provider da equipe envolvendo o app inteiro.
 // Fluxo: Menu -> Montar time (escolher o jogo) -> Equipe -> Pokédex -> Detalhes
+// O Menu também abre Ver Pokédex, Informações e Configurações.
 
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
@@ -25,6 +26,7 @@ import EliteLivre from './screens/EliteLivre';
 import EliteLivreCompleta from './screens/EliteLivreCompleta';
 import Informacoes from './screens/Informacoes';
 import InformacaoTexto from './screens/InformacaoTexto';
+import Configuracoes from './screens/Configuracoes';
 import { buscarInformacao } from './data/informacoes';
 import { NOME_LIVRE } from './data/livre';
 import { obterElite } from './services/eliteService';
@@ -94,6 +96,11 @@ export default function App() {
               options={{ title: 'Elite dos 4 e pós-game' }}
             />
             <Stack.Screen name="Informacoes" component={Informacoes} options={{ title: 'Informações' }} />
+            <Stack.Screen
+              name="Configuracoes"
+              component={Configuracoes}
+              options={{ title: 'Configurações' }}
+            />
             <Stack.Screen
               name="InformacaoTexto"
               component={InformacaoTexto}

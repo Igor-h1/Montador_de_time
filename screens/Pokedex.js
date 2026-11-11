@@ -9,7 +9,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, Switch, ActivityIndicator, StyleSheet } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Card from '../components/Card';
 import Botao from '../components/Botao';
@@ -19,6 +18,7 @@ import { COR } from '../data/tema';
 import { listarPorJogo, obterSprite } from '../services/pokemonService';
 import { carregarPokedexOnline, dexOnlineCarregada } from '../services/pokedexOnline';
 import useRede from '../services/useRede';
+import { semInternet } from '../services/rede';
 import { passaFiltroTipos, MODO_QUALQUER } from '../services/filtros';
 
 // Minúsculas e sem acentos, para a busca não depender de maiúsculas
@@ -44,8 +44,7 @@ export default function Pokedex({ navigation, route }) {
   const carregarDex = useCallback(async () => {
     setErro(null);
     try {
-      const rede = await NetInfo.fetch();
-      if (rede.isConnected === false || rede.isInternetReachable === false) {
+      if (await semInternet()) {
         setErro('Sem internet. Conecte-se para carregar a lista deste jogo.');
         return;
       }

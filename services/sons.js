@@ -2,17 +2,17 @@
 // Toca os sons registrados em data/sons.js (biblioteca expo-audio).
 //   tocarSom('botao')        toca o som; se não houver arquivo, não faz nada
 //   precarregarSons()        carrega todos de antemão (o primeiro toque não atrasa)
-//   ativarSons(false)        silencia tudo (para as Configurações no futuro)
+//   ativarSons(false)        silencia tudo (atalho para a configuração "somAtivo")
 // Um erro de áudio nunca derruba o app: o som é só um detalhe.
 
 import { createAudioPlayer } from 'expo-audio';
 import { SONS } from '../data/sons';
+import { obterConfiguracoes, definirConfiguracao } from './configuracoes';
 
 const players = {};
-let ativado = true;
 
 export function ativarSons(valor) {
-  ativado = Boolean(valor);
+  definirConfiguracao('somAtivo', valor);
 }
 
 function obterPlayer(nome) {
@@ -33,7 +33,7 @@ export function precarregarSons() {
 }
 
 export function tocarSom(nome) {
-  if (!ativado) return;
+  if (!obterConfiguracoes().somAtivo) return;
   try {
     const player = obterPlayer(nome);
     if (!player) return;

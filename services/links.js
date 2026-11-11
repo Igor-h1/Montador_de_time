@@ -2,7 +2,7 @@
 // Abrir páginas da web com checagem de internet.
 
 import { Linking } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
+import { semInternet } from './rede';
 
 // Página do Pokémon na Bulbapedia (a wiki de Pokémon). Ex.: "Mr. Mime" -> Mr._Mime_(Pokémon)
 export function urlWiki(nomePokemon) {
@@ -13,9 +13,8 @@ export function urlWiki(nomePokemon) {
 // Retorna { ok: true } ou { ok: false, motivo: '...' }
 export async function abrirLink(url) {
   try {
-    const rede = await NetInfo.fetch();
-    // isInternetReachable pode ser null (ainda não sabe): nesse caso tentamos abrir
-    if (rede.isConnected === false || rede.isInternetReachable === false) {
+    // semInternet() considera o modo offline simulado e a conexão de verdade
+    if (await semInternet()) {
       return { ok: false, motivo: 'Sem internet. Conecte-se para ver mais detalhes.' };
     }
     await Linking.openURL(url);

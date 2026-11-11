@@ -7,8 +7,7 @@
 // para a Equipe (navigation.pop(2)).
 
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Image, Linking, StyleSheet } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
+import { ScrollView, View, Text, Image, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Botao from '../components/Botao';
 import BadgeTipo from '../components/BadgeTipo';
@@ -30,6 +29,7 @@ import {
 import { fontesShiny } from '../services/shiny';
 import useRede from '../services/useRede';
 import { obterEvolucao, temDadosEvolucao } from '../services/evolucoes';
+import { abrirLink } from '../services/links';
 import { useEquipe } from '../context/EquipeContext';
 
 const formatarNumero = (numero) => '#' + String(numero).padStart(3, '0');
@@ -103,17 +103,8 @@ export default function Detalhes({ navigation, route }) {
   }
 
   async function aoSaberMais() {
-    try {
-      const rede = await NetInfo.fetch();
-      // isInternetReachable pode ser null (ainda não sabe): nesse caso tentamos abrir
-      if (rede.isConnected === false || rede.isInternetReachable === false) {
-        setAviso({ tipo: 'erro', texto: 'Sem internet. Conecte-se para ver mais detalhes.' });
-        return;
-      }
-      await Linking.openURL(urlSaibaMais(pokemon));
-    } catch (erro) {
-      setAviso({ tipo: 'erro', texto: 'Não foi possível abrir o site.' });
-    }
+    const resultado = await abrirLink(urlSaibaMais(pokemon));
+    if (!resultado.ok) setAviso({ tipo: 'erro', texto: resultado.motivo });
   }
 
   return (

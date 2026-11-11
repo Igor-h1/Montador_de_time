@@ -4,7 +4,7 @@
 //  - Montar time: abre a escolha de jogo (rota 'MontarTime')
 //  - Ver Pokédex: todos os Pokémon do app, só para consulta (precisa de internet)
 //  - Informações: direitos autorais, como o app usa as APIs e o contexto do app
-//  - Configurações: ainda sem função
+//  - Configurações: som e modo offline (simulado)
 // A tela verde mostra a descrição da opção selecionada.
 // Como usar: tocar numa opção a seleciona; tocar de novo (ou no ✓) abre.
 // O direcional sobe e desce a seleção. Os sons ficam em data/sons.js.
@@ -18,6 +18,7 @@ import { NOME_APP } from '../data/app';
 import { ICONES_MENU } from '../data/iconesMenu';
 import { precarregarSons, tocarSom } from '../services/sons';
 import useRede from '../services/useRede';
+import { useConfiguracoes } from '../services/configuracoes';
 
 // emBreve: true = a opção ainda não abre nada (troque para false e informe a rota quando existir)
 const OPCOES = [
@@ -47,14 +48,15 @@ const OPCOES = [
     id: 'config',
     icone: '⚙️',
     nome: 'Configurações',
-    descricao: 'Ajustes do aplicativo.',
-    emBreve: true,
+    descricao: 'Som e modo offline.',
+    rota: 'Configuracoes',
   },
 ];
 
 export default function Menu({ navigation }) {
   const insets = useSafeAreaInsets();
   const online = useRede(); // true | false | null (ainda verificando)
+  const { modoOffline } = useConfiguracoes();
 
   const [indice, setIndice] = useState(0);
   // Mensagem temporária na tela verde ({ titulo, texto }), por exemplo "SEM INTERNET"
@@ -137,7 +139,7 @@ export default function Menu({ navigation }) {
         onConfirmar={abrir}
         onCancelar={cancelar}
       >
-        <Text style={styles.tituloTela}>MENU</Text>
+        <Text style={styles.tituloTela}>{modoOffline ? 'MENU · MODO OFFLINE' : 'MENU'}</Text>
 
         <ScrollView ref={rolagem} showsVerticalScrollIndicator={false}>
         {OPCOES.map((o, i) => {
