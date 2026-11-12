@@ -23,6 +23,8 @@ const CLARO = {
   cabecalho: '#D0403A', // barra de título
   fundoSprite: '#F5F6F8', // quadrado atrás dos sprites
   placaSprite: '#FFFFFF', // placa atrás do sprite solto no cartão (invisível no claro)
+  circuloSprite: '#FFFFFF', // círculo atrás do sprite nas telas de detalhes
+  peliculaCapa: 'rgba(0,0,0,0)', // véu sobre as capas dos jogos (nenhum no claro)
 
   erroFundo: '#F8D7DA',
   erroTexto: '#842029',
@@ -51,8 +53,13 @@ const ESCURO = {
   branco: '#FFFFFF',
 
   cabecalho: '#8F2B26',
-  fundoSprite: '#E4E7EB', // sprites têm contorno escuro: ficam sobre um fundo claro
-  placaSprite: '#E4E7EB',
+  // Fundos dos sprites: um cinza um pouco mais claro que os cartões, para o contorno escuro
+  // dos sprites continuar aparecendo sem o "clarão" de um fundo branco
+  fundoSprite: '#373D46',
+  placaSprite: '#373D46',
+  circuloSprite: '#373D46',
+  // As capas dos jogos têm muito branco: um véu escuro leve tira o "clarão" (0 = nenhum, 1 = preto)
+  peliculaCapa: 'rgba(0,0,0,0.35)',
 
   erroFundo: '#3B1F23',
   erroTexto: '#F2B8BE',

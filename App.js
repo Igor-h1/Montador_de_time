@@ -1,16 +1,19 @@
 // App.js
 // Navegação (Stack) + Providers do tema e da equipe envolvendo o app inteiro.
+// As equipes e as configurações são salvas no aparelho (AsyncStorage).
 // Fluxo: Menu -> Montar time (escolher o jogo) -> Equipe -> Pokédex -> Detalhes
 // O Menu também abre Ver Pokédex, Informações e Configurações.
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { EquipeProvider } from './context/EquipeContext';
+import { EquipeProvider, useEquipe } from './context/EquipeContext';
 import { JOGOS } from './data/jogos';
 import { TemaProvider, useTema } from './services/tema';
+import { carregarConfiguracoes } from './services/configuracoes';
 import { buscarPorId } from './services/pokemonService';
 import Menu from './screens/Menu';
 import Home from './screens/Home';
@@ -150,12 +153,32 @@ function Navegacao() {
   );
 }
 
+// Espera ler do aparelho as equipes e as configurações salvas antes de mostrar as telas
+// (assim o app já abre no tema certo e com os times de volta). Leva uma fração de segundo.
+function Raiz() {
+  const { carregado } = useEquipe();
+  const [configuracoesProntas, setConfiguracoesProntas] = useState(false);
+
+  useEffect(() => {
+    carregarConfiguracoes().then(() => setConfiguracoesProntas(true));
+  }, []);
+
+  if (!carregado || !configuracoesProntas) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#D0403A' }}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
+  return <Navegacao />;
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <TemaProvider>
         <EquipeProvider>
-          <Navegacao />
+          <Raiz />
         </EquipeProvider>
       </TemaProvider>
     </SafeAreaProvider>

@@ -154,7 +154,7 @@ const criarEstilos = (COR) => StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: COR.branco,
+    backgroundColor: COR.circuloSprite,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,

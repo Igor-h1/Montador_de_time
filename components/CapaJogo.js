@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
-import { COR, SOMBRA } from '../data/tema';
+import { SOMBRA } from '../data/tema';
+import { useEstilos } from '../services/tema';
 import { tocarSom } from '../services/sons';
 
 export default function CapaJogo({ jogo, capa, quantidade, max, onPress, style }) {
+  const styles = useEstilos(criarEstilos);
   return (
     <Pressable
       accessibilityRole="button"
@@ -15,7 +17,11 @@ export default function CapaJogo({ jogo, capa, quantidade, max, onPress, style }
       style={({ pressed }) => [styles.cartao, pressed && styles.pressionado, style]}
     >
       {capa ? (
-        <Image source={capa} style={styles.capa} resizeMode="cover" />
+        <View style={styles.capa}>
+          <Image source={capa} style={styles.capaImagem} resizeMode="cover" />
+          {/* No modo escuro, um véu leve escurece a capa para o branco da arte não ofuscar */}
+          <View pointerEvents="none" style={styles.pelicula} />
+        </View>
       ) : (
         <View style={[styles.capaVazia, { backgroundColor: jogo.cor }]}>
           <Text style={styles.iniciais}>{jogo.nome}</Text>
@@ -33,10 +39,10 @@ export default function CapaJogo({ jogo, capa, quantidade, max, onPress, style }
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (COR) => StyleSheet.create({
   cartao: {
     overflow: 'hidden',
-    backgroundColor: COR.branco,
+    backgroundColor: COR.cartao,
     borderRadius: 16,
     marginBottom: 14,
     borderWidth: 1,
@@ -45,6 +51,8 @@ const styles = StyleSheet.create({
   },
   pressionado: { opacity: 0.8 },
   capa: { width: '100%', height: 150 },
+  capaImagem: { width: '100%', height: '100%' },
+  pelicula: { ...StyleSheet.absoluteFillObject, backgroundColor: COR.peliculaCapa },
   capaVazia: { height: 150, alignItems: 'center', justifyContent: 'center', padding: 12 },
   iniciais: { color: COR.branco, fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
   info: { padding: 12 },
