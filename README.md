@@ -71,7 +71,8 @@ O app tem 15 telas, todas declaradas em um único Stack no `App.js`.
 
 ## Vídeo de demonstração
 
-`demo/demo.mp4` (até 30 segundos).
+`demo/demo.mp4`  30 segundos.
+`demo/demo(em 1080p)` 30 segundos porém por causa de alguns mb a mais n roda no git hub pelo navegador então coloquei ele em outro lugar.
 
 ## Como executar
 
