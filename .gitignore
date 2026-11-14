@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Cache dos scripts (respostas da PokéAPI e arquivos temporários); é recriado ao rodar os scripts
+scripts/cache/
