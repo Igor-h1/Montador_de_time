@@ -1,7 +1,5 @@
 # Poké Team
 
-> O nome é provisório: ele vem de `data/app.js` (`NOME_APP`) e aparece no topo do aparelho do menu.
-
 ## Descrição
 
 Aplicativo em **React Native + Expo** para **montar times Pokémon** e consultar os Pokémon das
@@ -12,8 +10,8 @@ Projeto educacional, sem fins comerciais e **não oficial** (veja [Créditos](#c
 
 ## Aluno
 
-- Nome: **(preencher)**
-- RGM: **(preencher)**
+- Nome: **Igor Henrique Marques de Oliveira**
+- RGM: **42249759**
 
 ## Telas
 
