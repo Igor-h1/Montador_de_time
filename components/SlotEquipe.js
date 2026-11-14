@@ -6,7 +6,8 @@ import { SOMBRA } from '../data/tema';
 import { useEstilos } from '../services/tema';
 import { tocarSom, tocarSomPokemon } from '../services/sons';
 
-export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style }) {
+// shiny: true mostra o selo ✨ (o sprite shiny chega pela prop "sprite")
+export default function SlotEquipe({ pokemon, sprite, shiny, onPress, onRemover, style }) {
   const styles = useEstilos(criarEstilos);
   if (!pokemon) {
     return (
@@ -50,6 +51,8 @@ export default function SlotEquipe({ pokemon, sprite, onPress, onRemover, style 
       >
         <Text style={styles.removerTexto}>✕</Text>
       </Pressable>
+
+      {shiny ? <Text style={styles.brilho}>✨</Text> : null}
 
       <SpriteRemoto fontes={fontes} style={styles.imagem} />
 
@@ -100,6 +103,7 @@ const criarEstilos = (COR) => StyleSheet.create({
     justifyContent: 'center',
     zIndex: 1,
   },
+  brilho: { position: 'absolute', top: 5, left: 6, fontSize: 12, zIndex: 1 },
   removerTexto: { color: COR.branco, fontSize: 11, fontWeight: 'bold' },
   imagem: { width: 54, height: 54, borderRadius: 10, backgroundColor: COR.placaSprite },
   interrogacao: { fontSize: 28, color: '#B0B5BD', fontWeight: 'bold' },

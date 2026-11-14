@@ -1,8 +1,10 @@
 // services/persistenciaEquipe.js
 // Como as equipes são guardadas no aparelho e como o que foi guardado é conferido ao ler.
 // Formato salvo: { firered: [6, 94], emerald: [], ..., livre: [] } (só os ids dos Pokémon).
+// Os Pokémon salvos como SHINY ficam numa lista à parte, no mesmo formato (CHAVE_SHINIES).
 
 export const CHAVE_EQUIPES = 'equipes_v1';
+export const CHAVE_SHINIES = 'shinies_v1';
 
 // Aceita só o que ainda faz sentido: equipes de jogos que existem, ids inteiros de Pokémon
 // que existem, sem repetição e até "max" por equipe. O resto (dado antigo, corrompido ou de
@@ -20,6 +22,25 @@ export function validarEquipes(salvo, chaves, existe, max) {
       if (Number.isInteger(id) && existe(id) && !ids.includes(id)) ids.push(id);
     });
     resultado[chave] = ids.slice(0, max);
+  });
+  return resultado;
+}
+
+// Confere os shinies salvos: só vale quem ainda está na equipe (as equipes já validadas)
+//   salvo     o que veio do armazenamento (qualquer coisa)
+//   equipes   resultado de validarEquipes
+//   chaves    ids de equipe válidos
+export function validarShinies(salvo, equipes, chaves) {
+  const resultado = {};
+  chaves.forEach((chave) => {
+    const lista = salvo && Array.isArray(salvo[chave]) ? salvo[chave] : [];
+    const naEquipe = equipes[chave] || [];
+    const ids = [];
+    lista.forEach((bruto) => {
+      const id = Number(bruto);
+      if (naEquipe.includes(id) && !ids.includes(id)) ids.push(id);
+    });
+    resultado[chave] = ids;
   });
   return resultado;
 }

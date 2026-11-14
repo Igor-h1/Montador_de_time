@@ -16,6 +16,8 @@ import Botao from '../components/Botao';
 import { JOGOS } from '../data/jogos';
 import { useEstilos } from '../services/tema';
 import { obterSprite } from '../services/pokemonService';
+import { fontesShiny } from '../services/shiny';
+import useRede from '../services/useRede';
 import { analisarElite } from '../services/eliteService';
 import { useEquipe } from '../context/EquipeContext';
 
@@ -23,7 +25,8 @@ export default function Equipe({ navigation, route }) {
   const styles = useEstilos(criarEstilos);
   const jogoId = route.params.jogo;
   const jogo = JOGOS[jogoId];
-  const { pokemonsDaEquipe, remover, MAX_EQUIPE } = useEquipe();
+  const { pokemonsDaEquipe, remover, ehShiny, MAX_EQUIPE } = useEquipe();
+  const online = useRede(); // o sprite shiny só carrega com internet
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   const lista = useMemo(() => pokemonsDaEquipe(jogoId), [pokemonsDaEquipe, jogoId]);
@@ -42,6 +45,15 @@ export default function Equipe({ navigation, route }) {
 
   // Vantagem/desvantagem contra a Elite dos 4 (recalcula quando a equipe muda)
   const analise = useMemo(() => analisarElite(jogoId, lista), [jogoId, lista]);
+
+  // Pokémon salvo como shiny mostra o sprite shiny; sem internet, cai para o normal
+  function spriteDoSlot(pokemon) {
+    const normal = obterSprite(pokemon.id, jogoId);
+    if (online !== false && ehShiny(pokemon.id, jogoId)) {
+      return [...fontesShiny(pokemon.id, jogoId), ...(normal ? [normal] : [])];
+    }
+    return normal;
+  }
 
   // Slot preenchido abre os Detalhes; slot vazio abre a Pokédex
   function aoTocarSlot(pokemon) {
@@ -77,7 +89,8 @@ export default function Equipe({ navigation, route }) {
           <SlotEquipe
             key={indice}
             pokemon={pokemon}
-            sprite={pokemon ? obterSprite(pokemon.id, jogoId) : null}
+            sprite={pokemon ? spriteDoSlot(pokemon) : null}
+            shiny={pokemon ? ehShiny(pokemon.id, jogoId) : false}
             onPress={aoTocarSlot}
             onRemover={(p) => remover(p.id, jogoId)}
             style={styles.slot}

@@ -31,11 +31,12 @@ export default function PokedexDetalhes({ navigation, route }) {
   const pokemon = buscarPorId(pokemonId);
   const insets = useSafeAreaInsets(); // margem para os botões do Android
   const [aviso, setAviso] = useState(null);
-  const { equipe, adicionar, remover } = useEquipe();
+  const { equipe, adicionar, remover, ehShiny, definirShiny } = useEquipe();
   const montando = Boolean(route.params.montando); // veio do ambiente livre
   // Shiny: só existe na internet. Ao perder a conexão, volta ao sprite normal.
   const online = useRede();
-  const [shiny, setShiny] = useState(false);
+  // Vindo do ambiente livre, já começa shiny se o Pokémon está na equipe salvo como shiny
+  const [shiny, setShiny] = useState(() => montando && ehShiny(pokemonId, ID_LIVRE));
   useEffect(() => {
     if (online === false) setShiny(false);
   }, [online]);
@@ -68,8 +69,16 @@ export default function PokedexDetalhes({ navigation, route }) {
     setAviso('Não foi possível carregar o shiny.');
   }
 
+  // Se o Pokémon já está na equipe livre, a escolha shiny/normal é salva junto com ele
+  function aoAlternarShiny() {
+    const novo = !shiny;
+    setShiny(novo);
+    if (montando && jaNoTime) definirShiny(pokemon.id, ID_LIVRE, novo);
+  }
+
   function aoAdicionar() {
-    const resultado = adicionar(pokemon.id, ID_LIVRE);
+    // salva o Pokémon como shiny se o botão ✨ estiver ligado
+    const resultado = adicionar(pokemon.id, ID_LIVRE, { shiny });
     if (resultado.ok) {
       // Equipe livre -> Pokédex -> Detalhes: volta 2 telas, para a equipe
       navigation.pop(2);
@@ -106,7 +115,7 @@ export default function PokedexDetalhes({ navigation, route }) {
             <BadgeTipo key={tipo} tipo={tipo} />
           ))}
         </View>
-        <BotaoShiny ativo={shiny} desabilitado={online === false} onPress={() => setShiny(!shiny)} />
+        <BotaoShiny ativo={shiny} desabilitado={online === false} onPress={aoAlternarShiny} />
       </View>
 
       <View style={styles.conteudo}>

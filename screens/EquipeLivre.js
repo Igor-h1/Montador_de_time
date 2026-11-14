@@ -15,13 +15,15 @@ import GraficoElite from '../components/GraficoElite';
 import Botao from '../components/Botao';
 import { useEstilos } from '../services/tema';
 import { ID_LIVRE, NOME_LIVRE } from '../data/livre';
-import { fontesSprite } from '../services/spritesGeral';
+import { fontesSprite, fontesSpriteShiny } from '../services/spritesGeral';
+import useRede from '../services/useRede';
 import { analisarEliteLivre } from '../services/eliteService';
 import { useEquipe } from '../context/EquipeContext';
 
 export default function EquipeLivre({ navigation }) {
   const styles = useEstilos(criarEstilos);
-  const { pokemonsDaEquipe, remover, MAX_EQUIPE } = useEquipe();
+  const { pokemonsDaEquipe, remover, ehShiny, MAX_EQUIPE } = useEquipe();
+  const online = useRede(); // o sprite shiny só carrega com internet
   const insets = useSafeAreaInsets(); // margem para os botões do Android
 
   const lista = useMemo(() => pokemonsDaEquipe(ID_LIVRE), [pokemonsDaEquipe]);
@@ -51,6 +53,14 @@ export default function EquipeLivre({ navigation }) {
     }),
     [analise]
   );
+
+  // Pokémon salvo como shiny mostra o sprite shiny; sem internet, cai para o normal
+  function spriteDoSlot(pokemon) {
+    if (online !== false && ehShiny(pokemon.id, ID_LIVRE)) {
+      return [...fontesSpriteShiny(pokemon.id), ...fontesSprite(pokemon.id)];
+    }
+    return fontesSprite(pokemon.id);
+  }
 
   // Slot preenchido abre os detalhes; slot vazio abre a Pokédex geral para escolher
   function aoTocarSlot(pokemon) {
@@ -86,7 +96,8 @@ export default function EquipeLivre({ navigation }) {
           <SlotEquipe
             key={indice}
             pokemon={pokemon}
-            sprite={pokemon ? fontesSprite(pokemon.id) : null}
+            sprite={pokemon ? spriteDoSlot(pokemon) : null}
+            shiny={pokemon ? ehShiny(pokemon.id, ID_LIVRE) : false}
             onPress={aoTocarSlot}
             onRemover={(p) => remover(p.id, ID_LIVRE)}
             style={styles.slot}

@@ -42,7 +42,7 @@ export default function Detalhes({ navigation, route }) {
   const pokemon = buscarPorId(pokemonId);
   const sprite = obterSprite(pokemonId, jogoId);
 
-  const { equipe, adicionar, remover } = useEquipe();
+  const { equipe, adicionar, remover, ehShiny, definirShiny } = useEquipe();
   // Margem inferior para o conteúdo não ficar atrás dos botões do Android
   const insets = useSafeAreaInsets();
   const [erroImagem, setErroImagem] = useState(false);
@@ -50,7 +50,8 @@ export default function Detalhes({ navigation, route }) {
   const [aviso, setAviso] = useState(null);
   // Shiny: só existe na internet. Ao perder a conexão, volta ao sprite normal.
   const online = useRede();
-  const [shiny, setShiny] = useState(false);
+  // Já começa shiny se o Pokémon está na equipe salvo como shiny
+  const [shiny, setShiny] = useState(() => ehShiny(pokemonId, jogoId));
   useEffect(() => {
     if (online === false) setShiny(false);
   }, [online]);
@@ -89,8 +90,16 @@ export default function Detalhes({ navigation, route }) {
     setAviso({ tipo: 'erro', texto: 'Não foi possível carregar o shiny.' });
   }
 
+  // Se o Pokémon já está na equipe, a escolha shiny/normal é salva junto com ele
+  function aoAlternarShiny() {
+    const novo = !shiny;
+    setShiny(novo);
+    if (jaNoTime) definirShiny(pokemon.id, jogoId, novo);
+  }
+
   function aoAdicionar() {
-    const resultado = adicionar(pokemon.id, jogoId);
+    // salva o Pokémon como shiny se o botão ✨ estiver ligado
+    const resultado = adicionar(pokemon.id, jogoId, { shiny });
     if (resultado.ok) {
       // Estamos em Equipe -> Pokédex -> Detalhes: volta 2 telas, para a Equipe
       navigation.pop(2);
@@ -143,7 +152,7 @@ export default function Detalhes({ navigation, route }) {
           ))}
         </View>
         <Text style={styles.jogo}>{jogo.nome}</Text>
-        <BotaoShiny ativo={shiny} desabilitado={online === false} onPress={() => setShiny(!shiny)} />
+        <BotaoShiny ativo={shiny} desabilitado={online === false} onPress={aoAlternarShiny} />
       </View>
 
       <View style={styles.conteudo}>
