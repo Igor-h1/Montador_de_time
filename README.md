@@ -176,4 +176,3 @@ e são usados só com finalidade educacional.
 - Páginas de consulta ("Saiba mais"): [Pokémon Database](https://pokemondb.net/) e [Bulbapedia](https://bulbapedia.bulbagarden.net/)
 - Conferência dos times da Elite dos 4: [Serebii](https://www.serebii.net/)
 - Sons dos tipos e do shiny: gerados por síntese para este projeto.
-- Sons do menu e capas dos jogos: **(preencher a origem)**
