@@ -76,6 +76,14 @@ export const INFORMACOES = [
         ],
       },
       {
+        titulo: 'Salvo no aparelho',
+        itens: [
+          'As equipes de cada jogo e a do ambiente livre: você fecha o app e elas continuam lá.',
+          'O som e o modo escuro, ligados nas Configurações.',
+          'O modo offline não é salvo: ele só simula a falta de internet e volta desligado ao abrir o app.',
+        ],
+      },
+      {
         titulo: 'Sobre a Elite dos 4',
         paragrafos: [
           'A PokéAPI não tem os times da Elite dos 4. Eles foram montados a partir de um documento do projeto, com ajustes feitos em sites de referência (como Serebii e Bulbapedia).',
@@ -94,6 +102,7 @@ export const INFORMACOES = [
           'React Native com Expo',
           'React Navigation (telas)',
           'NetInfo (detecta a internet)',
+          'AsyncStorage (guarda as equipes e as configurações no aparelho)',
           'expo-audio (sons)',
         ],
       },
@@ -131,6 +140,7 @@ export const INFORMACOES = [
           'Compara a equipe com a Elite dos 4 e os campeões e aponta onde ela mais sofre.',
           'Cada jogo tem a sua lista, os seus números de Pokédex e os seus sprites.',
           'Funciona sem internet nos jogos de Kanto e Hoenn (FireRed, LeafGreen, Ruby, Sapphire e Emerald).',
+          'Guarda as suas equipes no aparelho e tem modo escuro.',
           'Tem um ambiente livre para testar qualquer combinação com os 649 Pokémon.',
           'É leve: guarda só o essencial e carrega as imagens da internet quando precisa.',
         ],
